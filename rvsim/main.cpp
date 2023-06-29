@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	if (argc < 1) emitError("use: rvcdiss <machine_code_file_name>\n");
+	if (argc < 1 || argv[1] == NULL) emitError("use: rvsim <machine_code_file_name>\n");
 
 	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 
