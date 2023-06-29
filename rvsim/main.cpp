@@ -1,7 +1,3 @@
-#include <iostream>
-
-using namespace std;
-
 /*
 	This is just a skeleton. It DOES NOT implement all the requirements.
 	It only recognizes the RV32I "ADD", "SUB" and "ADDI" instructions only.
@@ -22,7 +18,7 @@ using namespace std;
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
 
-void emitError(char* s)
+void emitError(const char* s)
 {
 	cout << s;
 	exit(0);
@@ -46,7 +42,7 @@ void instDecExec(unsigned int instWord)
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
 
-	// — inst[31] — inst[30:25] inst[24:21] inst[20]
+	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 
 	printPrefix(instPC, instWord);
