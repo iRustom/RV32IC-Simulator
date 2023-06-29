@@ -129,6 +129,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\t0.bin" />
+    <None Include="..\..\..\..\Downloads\t1-d.bin" />
+    <None Include="..\..\..\..\Downloads\t1.bin" />
+    <None Include="..\..\..\..\Downloads\t2.bin" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
