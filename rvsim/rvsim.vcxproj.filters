@@ -20,16 +20,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Downloads\t0.bin">
+    <None Include="..\Binary_Files\t0.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\..\Downloads\t1.bin">
+    <None Include="..\Binary_Files\t1.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\..\Downloads\t1-d.bin">
+    <None Include="..\Binary_Files\t1-d.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\..\Downloads\t2.bin">
+    <None Include="..\Binary_Files\t2.bin">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
