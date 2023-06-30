@@ -158,9 +158,25 @@ void instDecExec(unsigned int instWord)
 			default: cout << "\tUnkown I Instruction \n";
 		}
 	}
-	/*else if (opcode == 0x63) {	//B-type
+	else if (opcode == 0x63) {	//B-type
+
+	switch (funct3) {
+	case 0: cout << "\tbeq\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+			break;
+		case 1: cout << "\tbne\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+			break;
+		case 4: cout << "\tblt\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+			break;
+		case 5: cout << "\tbge\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+			break;
+		case 6:cout << "\tbltu\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+			break;
+		case 7: cout << "\tbgeu\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+			break;
+	}
 
 	}
+	/*
 	else if (opcode == 0x6F) {	//J-type
 
 	}
