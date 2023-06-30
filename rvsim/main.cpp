@@ -46,7 +46,7 @@ void instDecExec(unsigned int instWord)
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6);
-	
+	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
@@ -148,7 +148,7 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x23) {	//S-type
 		// rd is now imm[4:0]
 		// funct7 is now imm[11:5]
-		unsigned int S_imm = (funct7 <<5) | rd;
+		
 		switch(funct3){
 			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
 				break;
