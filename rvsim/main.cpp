@@ -31,7 +31,7 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
-	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm, shamt;
+	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
