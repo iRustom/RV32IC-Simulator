@@ -45,7 +45,8 @@ void instDecExec(unsigned int instWord)
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-
+	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6);
+	
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
@@ -158,6 +159,7 @@ void instDecExec(unsigned int instWord)
 			default: cout << "\tUnkown I Instruction \n";
 		}
 	}
+	
 	else if (opcode == 0x63) {	//B-type
 
 	switch (funct3) {
