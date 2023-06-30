@@ -46,6 +46,7 @@ void instDecExec(unsigned int instWord)
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	J_imm = ((instWord>>21)&0x3FF) | ((instWord>>20)&0x1) | ((instWord>>12)&0xFF) | ((instWord>>31)?0xFFF80000:0x0);
 
 	printPrefix(instPC, instWord);
 
@@ -177,11 +178,13 @@ void instDecExec(unsigned int instWord)
 	}
 
 	}
-	/*
+	
 	else if (opcode == 0x6F) {	//J-type
+		// only jal
+		cout << "\tjal\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
 
 	}
-	else if (opcode == 0x17) {	//U-type (AUIPC)
+	/*else if (opcode == 0x17) {	//U-type (AUIPC)
 
 	}
 	else if (opcode == 0x37) {	//U-type (LUI)
