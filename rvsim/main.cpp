@@ -197,10 +197,11 @@ void instDecExec(unsigned int instWord)
 
 	}
 
-	/*
+	
 	else if (opcode == 0x67) {	//I-type (JALR)
 
-	}*/
+	cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+	}
 	else {
 		cout << "\tUnkown Instruction \n";
 	}
@@ -208,11 +209,12 @@ void instDecExec(unsigned int instWord)
 
 int main(int argc, char* argv[]) {
 
-	unsigned int instWord = 0;
+	//unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
 
-
+	unsigned int instWord = 0b00000001100001001000010001100111;
+	instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
