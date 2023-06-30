@@ -182,26 +182,22 @@ void instDecExec(unsigned int instWord)
 
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
-		U_imm = U_imm >> 12;
-		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+	unsigned int U_imm_temp = U_imm >> 12; //to output correct value
+		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm_temp << "\n";
 	}
+
+	else if (opcode == 0x37) {	//U-type (LUI)
+	unsigned int U_imm_temp = U_imm >> 12; //to output correct value
+	cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm_temp << "\n";
+	}
+
 	else if (opcode == 0x6F) {	//J-type
 		// only jal
 		cout << "\tJAL\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
 
 	}
-	/*else if (opcode == 0x17) {	//U-type (AUIPC)
 
-	}
-	else if (opcode == 0x37) {	//U-type (LUI)
-	U_imm = U_imm >> 12;
-	cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
-	}
 	/*
-	else if (opcode == 0x6F) {	//J-type
-
-	}
-
 	else if (opcode == 0x67) {	//I-type (JALR)
 
 	}*/
