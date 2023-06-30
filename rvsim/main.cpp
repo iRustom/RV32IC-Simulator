@@ -158,7 +158,7 @@ void instDecExec(unsigned int instWord)
 				break;
 			case 2: cout << "\tSW\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
 				break;
-			default: cout << "\tUnkown I Instruction \n";
+			default: cout << "\tUnkown S Instruction \n";
 		}
 	}
 	else if (opcode == 0x63) {	//B-type
@@ -175,21 +175,21 @@ void instDecExec(unsigned int instWord)
 		break;
 	case 7: cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 		break;
+	default:
+		cout << "\tUnkown B Instruction \n";
 		}
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
 		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
 	}
 	else if (opcode == 0x37) {	//U-type (LUI)
-	cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
+		cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
 	}
-	else if (opcode == 0x6F) {	//J-type
-		// only jal
+	else if (opcode == 0x6F) {	//J-type (JAL)
 		cout << "\tJAL\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
 	}
 	else if (opcode == 0x67) {	//I-type (JALR)
-
-	cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
 	}
 	else {
 		cout << "\tUnkown Instruction \n";
