@@ -182,9 +182,9 @@ void instDecExec(unsigned int instWord)
 
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
-	U_imm = U_imm >> 12;
-	cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
-	
+		U_imm = U_imm >> 12;
+		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+	}
 	else if (opcode == 0x6F) {	//J-type
 		// only jal
 		cout << "\tJAL\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
@@ -212,7 +212,7 @@ void instDecExec(unsigned int instWord)
 
 int main(int argc, char* argv[]) {
 
-	//unsigned int instWord = 0;
+	unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
 
