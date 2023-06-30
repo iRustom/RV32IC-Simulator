@@ -45,7 +45,7 @@ void instDecExec(unsigned int instWord)
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-	S_imm = (funct7 <<5) | rd;
+	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 
 	printPrefix(instPC, instWord);
 
