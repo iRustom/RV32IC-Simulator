@@ -47,6 +47,7 @@ void instDecExec(unsigned int instWord)
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6);
 	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	U_imm = (instWord & 0xFFFFF000);
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
@@ -178,16 +179,19 @@ void instDecExec(unsigned int instWord)
 	}
 
 	}
+	else if (opcode == 0x17) {	//U-type (AUIPC)
+	U_imm = U_imm >> 12;
+	cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+	}
+	else if (opcode == 0x37) {	//U-type (LUI)
+	U_imm = U_imm >> 12;
+	cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm << "\n";
+	}
 	/*
 	else if (opcode == 0x6F) {	//J-type
 
 	}
-	else if (opcode == 0x17) {	//U-type (AUIPC)
 
-	}
-	else if (opcode == 0x37) {	//U-type (LUI)
-
-	}
 	else if (opcode == 0x67) {	//I-type (JALR)
 
 	}*/
@@ -202,7 +206,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b00000000100101000111110001100011;
+	unsigned int instWord = 0b0000000000011000101010110111;
 
 		instDecExec(instWord);
 
