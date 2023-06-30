@@ -47,6 +47,8 @@ void instDecExec(unsigned int instWord)
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6);
 	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	J_imm = (((instWord>>21)&0x3FF)<<1) | (((instWord>>20)&0x1)<<11) | (((instWord>>12)&0xFF)<<12) | ((instWord>>31)?0xFFF80000:0x0);
+  
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
@@ -178,11 +180,13 @@ void instDecExec(unsigned int instWord)
 	}
 
 	}
-	/*
+	
 	else if (opcode == 0x6F) {	//J-type
+		// only jal
+		cout << "\tJAL\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
 
 	}
-	else if (opcode == 0x17) {	//U-type (AUIPC)
+	/*else if (opcode == 0x17) {	//U-type (AUIPC)
 
 	}
 	else if (opcode == 0x37) {	//U-type (LUI)
