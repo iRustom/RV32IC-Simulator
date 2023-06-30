@@ -31,7 +31,7 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;	//temp initialization to funct7 until all types are implemented.
-	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
+	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm, shamt;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
@@ -50,20 +50,74 @@ void instDecExec(unsigned int instWord)
 	if (opcode == 0x33) {		// R Instructions
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
-			cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd and rs1 as decimal
 		}
 			  else {
-			cout << "\tADD\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
 		}
 			  break;
+
+		case 1: cout << "\tSLL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			break;
+
+		case 2: cout << "\tSLT\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			break;
+
+		case 3: cout << "\tSLTU\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			break;
+
+		case 4: cout << "\tXOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			break;
+
+		case 5: if (funct7 == 32) {
+			cout << "\tSRA\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		}
+			  else {
+			cout << "\tSRL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		}
+			  break;
+
+		case 6: cout << "\tOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			break;
+
+		case 7: cout << "\tAND\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			break;
+
 		default:
 			cout << "\tUnkown R Instruction \n";
 		}
 	}
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
-		case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";	//added "dec" to output rd and rs1 as decimal
 			break;
+
+		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((int)I_imm & 0x01F) << "\n";
+			break;
+
+		case 2:	cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			break;
+
+		case 3:	cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			break;
+
+		case 4:	cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			break;
+
+		case 5: if (funct7 == 32) {
+			cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((int)I_imm & 0x01F) << "\n";
+		}
+			  else {
+			cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((int)I_imm & 0x01F) << "\n";
+		}
+			  break;
+
+		case 6: cout << "\tORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			break;
+
+		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			break;
+
 		default:
 			cout << "\tUnkown I Instruction \n";
 		}
@@ -71,7 +125,6 @@ void instDecExec(unsigned int instWord)
 	else {
 		cout << "\tUnkown Instruction \n";
 	}
-
 }
 
 int main(int argc, char* argv[]) {
