@@ -30,7 +30,7 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 
 void instDecExec(unsigned int instWord)
 {
-	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;	//temp initialization to funct7 until all types are implemented.
+	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm, shamt;
 	unsigned int address;
 
@@ -41,6 +41,7 @@ void instDecExec(unsigned int instWord)
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
+	funct7 = (instWord >> 25) & 0x0000007F;
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
