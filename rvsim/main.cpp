@@ -45,6 +45,7 @@ void instDecExec(unsigned int instWord)
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	S_imm = (funct7 <<5) | rd;
 
 	printPrefix(instPC, instWord);
 
@@ -147,7 +148,7 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x23) {	//S-type
 		// rd is now imm[4:0]
 		// funct7 is now imm[11:5]
-		unsigned int S_imm = (funct7 <<5) | rd;
+		
 		switch(funct3){
 			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
 				break;
