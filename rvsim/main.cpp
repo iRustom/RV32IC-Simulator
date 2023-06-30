@@ -150,7 +150,7 @@ void instDecExec(unsigned int instWord)
 		switch(funct3){
 			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
 				break;
-			case 0: cout << "\tSH\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
+			case 1: cout << "\tSH\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
 				break;
 			case 2: cout << "\tSW\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
 				break;
