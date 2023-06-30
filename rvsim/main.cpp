@@ -163,17 +163,17 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x63) {	//B-type
 
 	switch (funct3) {
-	case 0: cout << "\tbeq\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 0: cout << "\tBEQ\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 1: cout << "\tbne\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 1: cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 4: cout << "\tblt\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 4: cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 5: cout << "\tbge\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 5: cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 6:cout << "\tbltu\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 6:cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 7: cout << "\tbgeu\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 7: cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
 	}
 
@@ -198,9 +198,13 @@ void instDecExec(unsigned int instWord)
 
 int main(int argc, char* argv[]) {
 
-	unsigned int instWord = 0;
+	//unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
+
+	unsigned int instWord = 0b00000000100101000111110001100011;
+
+		instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
