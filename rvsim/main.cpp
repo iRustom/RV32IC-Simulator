@@ -50,7 +50,7 @@ void instDecExec(unsigned int instWord)
 	if (opcode == 0x33) {		// R Instructions
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
-			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd and rs1 as decimal
+			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd, rs1, and rs2 as decimal
 		}
 			  else {
 			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
@@ -92,7 +92,7 @@ void instDecExec(unsigned int instWord)
 		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";	//added "dec" to output rd and rs1 as decimal
 			break;
 
-		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((int)I_imm & 0x01F) << "\n";
+		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
 			break;
 
 		case 2:	cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
@@ -105,10 +105,10 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 5: if (funct7 == 32) {
-			cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((int)I_imm & 0x01F) << "\n";
+			cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
 		}
 			  else {
-			cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((int)I_imm & 0x01F) << "\n";
+			cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
 		}
 			  break;
 
@@ -116,6 +116,27 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			break;
+
+		default:
+			cout << "\tUnkown I Instruction \n";
+		}
+	}
+	else if(opcode == 0x3) {	// I-type load instructions
+		switch (funct3) {
+		case 0: cout << "\tLB\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";	//added "dec" to output rd, rs1, and the offset as decimal
+			break;
+
+		case 1: cout << "\tLH\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			break;
+
+		case 2: cout << "\tLW\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			break;
+
+		case 4: cout << "\tLBU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			break;
+
+		case 5: cout << "\tLHU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
 			break;
 
 		default:
