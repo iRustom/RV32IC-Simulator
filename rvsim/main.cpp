@@ -144,10 +144,20 @@ void instDecExec(unsigned int instWord)
 			cout << "\tUnkown I Instruction \n";
 		}
 	}
-	/*else if (opcode == 0x23) {	//S-type
-
+	else if (opcode == 0x23) {	//S-type
+		// rd is now imm[4:0]
+		// funct7 is now imm[11:5]
+		switch(funct3){
+			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
+				break;
+			case 0: cout << "\tSH\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
+				break;
+			case 2: cout << "\tSW\tx" << dec << rs2 << ", " << (int)I_imm << "(x" << dec << rs1 <<")\n";
+				break;
+			default: cout << "\tUnkown I Instruction \n";
+		}
 	}
-	else if (opcode == 0x63) {	//B-type
+	/*else if (opcode == 0x63) {	//B-type
 
 	}
 	else if (opcode == 0x6F) {	//J-type
