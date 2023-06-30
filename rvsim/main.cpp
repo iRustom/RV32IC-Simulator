@@ -143,6 +143,24 @@ void instDecExec(unsigned int instWord)
 			cout << "\tUnkown I Instruction \n";
 		}
 	}
+	else if (opcode == 0x23) {	//S-type
+
+	}
+	else if (opcode == 0x63) {	//B-type
+
+	}
+	else if (opcode == 0x6F) {	//J-type
+
+	}
+	else if (opcode == 0x17) {	//U-type (AUIPC)
+
+	}
+	else if (opcode == 0x37) {	//U-type (LUI)
+
+	}
+	else if (opcode == 0x67) {	//I-type (JALR)
+
+	}
 	else {
 		cout << "\tUnkown Instruction \n";
 	}
