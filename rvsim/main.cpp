@@ -181,7 +181,7 @@ void instDecExec(unsigned int instWord)
 	
 	else if (opcode == 0x6F) {	//J-type
 		// only jal
-		cout << "\tjal\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
+		cout << "\tJAL\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
 
 	}
 	/*else if (opcode == 0x17) {	//U-type (AUIPC)
