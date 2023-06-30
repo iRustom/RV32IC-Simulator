@@ -147,7 +147,7 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x23) {	//S-type
 		// rd is now imm[4:0]
 		// funct7 is now imm[11:5]
-		unisgned int S_imm = (funct7 <<5) | rd;
+		unsigned int S_imm = (funct7 <<5) | rd;
 		switch(funct3){
 			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
 				break;
