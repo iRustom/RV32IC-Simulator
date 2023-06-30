@@ -151,7 +151,6 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x23) {	//S-type
 		// rd is now imm[4:0]
 		// funct7 is now imm[11:5]
-		
 		switch(funct3){
 			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
 				break;
@@ -162,42 +161,32 @@ void instDecExec(unsigned int instWord)
 			default: cout << "\tUnkown I Instruction \n";
 		}
 	}
-	
 	else if (opcode == 0x63) {	//B-type
-
 	switch (funct3) {
 	case 0: cout << "\tBEQ\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			break;
-		case 1: cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			break;
-		case 4: cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			break;
-		case 5: cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			break;
-		case 6:cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			break;
-		case 7: cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
-			break;
-	}
-
+		break;
+	case 1: cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		break;
+	case 4: cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		break;
+	case 5: cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		break;
+	case 6:cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		break;
+	case 7: cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		break;
+		}
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
-	unsigned int U_imm_temp = U_imm >> 12; //to output correct value
-		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm_temp << "\n";
+		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
 	}
-
 	else if (opcode == 0x37) {	//U-type (LUI)
-	unsigned int U_imm_temp = U_imm >> 12; //to output correct value
-	cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << (int)U_imm_temp << "\n";
+	cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
 	}
-
 	else if (opcode == 0x6F) {	//J-type
 		// only jal
 		cout << "\tJAL\tx" << dec << rd << ", " << hex << "0x" << (int)J_imm << "\n";
-
 	}
-
-	
 	else if (opcode == 0x67) {	//I-type (JALR)
 
 	cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
