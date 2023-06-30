@@ -45,9 +45,10 @@ void instDecExec(unsigned int instWord)
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6);
 	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	J_imm = (((instWord>>21)&0x3FF)<<1) | (((instWord>>20)&0x1)<<11) | (((instWord>>12)&0xFF)<<12) | ((instWord>>31)?0xFFF80000:0x0);
-
+  
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x33) {		// R Instructions
@@ -160,20 +161,21 @@ void instDecExec(unsigned int instWord)
 			default: cout << "\tUnkown I Instruction \n";
 		}
 	}
+	
 	else if (opcode == 0x63) {	//B-type
 
 	switch (funct3) {
-	case 0: cout << "\tbeq\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 0: cout << "\tBEQ\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 1: cout << "\tbne\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 1: cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 4: cout << "\tblt\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 4: cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 5: cout << "\tbge\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 5: cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 6:cout << "\tbltu\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 6:cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
-		case 7: cout << "\tbgeu\tx" << dec << rs1 << ", x" << rs1 << ", " << hex << "0x" << (int)B_imm << "\n";
+		case 7: cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
 			break;
 	}
 
@@ -200,9 +202,13 @@ void instDecExec(unsigned int instWord)
 
 int main(int argc, char* argv[]) {
 
-	unsigned int instWord = 0;
+	//unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
+
+	unsigned int instWord = 0b00000000100101000111110001100011;
+
+		instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
