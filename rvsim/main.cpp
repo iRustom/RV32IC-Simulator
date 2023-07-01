@@ -237,6 +237,14 @@ void instDecExec(unsigned int instWord)
 	}
 }
 
+// function to decompress compressed instructions into 32 bit instructions
+unsigned int decompress(unsigned int instWord) {
+	// pattern?
+	return 0;
+}
+
+	
+
 int main(int argc, char* argv[]) {
 
 	//unsigned int instWord = 0;
@@ -258,11 +266,28 @@ int main(int argc, char* argv[]) {
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 
 		while (true) {
+			// condition to check if it is compressed instruction
+			if ((memory[pc] & 0b11) == 0b11) {
+				instWord = (unsigned char)memory[pc] |
+					(((unsigned char)memory[pc + 1]) << 8) |
+					(((unsigned char)memory[pc + 2]) << 16) |
+					(((unsigned char)memory[pc + 3]) << 24);
+				pc += 4;
+			}
+			else {
+				instWord = (unsigned char)memory[pc] |
+					(((unsigned char)memory[pc + 1]) << 8);
+				// instword = decompress(instWord);
+				pc += 2;
+			}
+
+			/* removed to allow for compressed instructions
 			instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8) |
 				(((unsigned char)memory[pc + 2]) << 16) |
 				(((unsigned char)memory[pc + 3]) << 24);
-			pc += 4;
+			pc += 4;*/
+
 			// remove the following line once you have a complete simulator
 			if (pc == 32) break;			// stop when PC reached address 32
 			instDecExec(instWord);
