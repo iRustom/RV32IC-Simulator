@@ -12,11 +12,49 @@
 #include <fstream>
 #include "stdlib.h"
 #include <iomanip>
+#include <cstring> //for memset
 
 using namespace std;
 
+// data structure for registers
+
+class regfile {
+
+  struct bit32 {
+    unsigned int value;
+    bool is_const;
+
+    template <typename T>
+    unsigned int operator=(T x) {
+      if (!is_const) {
+        value = x;
+      }
+      return value;
+    }
+
+    friend ostream &operator<<(ostream &os, const bit32 &reg) {
+      os << reg.value;
+      return os;
+    }
+  };
+
+  bit32 arr[32];
+public:
+  bit32 &operator[](int index) {
+    return arr[index];
+  }
+
+  regfile() {
+    memset(arr, 0, sizeof(arr));
+    arr[0].is_const = 1;
+  }
+
+};
+// initialise via rv registers; all regs would be 0
+
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
+regfile regs;
 
 void emitError(const char* s)
 {
@@ -25,7 +63,7 @@ void emitError(const char* s)
 }
 
 void printPrefix(unsigned int instA, unsigned int instW) {
-	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
+	cout << "0x" << hex << setfill('0') << setw(8) << instA << "\t0x" << setw(8) << instW;
 }
 
 void instDecExec(unsigned int instWord)
