@@ -240,7 +240,77 @@ void instDecExec(unsigned int instWord)
 
 // function to decompress compressed instructions into 32 bit instructions
 unsigned int decompress(unsigned int instWord) {
-	// pattern?
+	// if opcode
+	// switch funct 3
+	unsigned int opcode = instWord & 0b11;
+	unsigned int funct3 = instWord & 0xE000;
+	if(opcode == 0){
+		switch(funct3){
+			case 0b000:
+				// C.ADDI4SPN
+				break;
+			case 0b010:
+				// C.LW
+				break;
+			case 0b110:
+				// C.SW
+				break;
+		}
+	}else if(opcode == 1){
+		switch(funct3){
+			case 0b000:
+				// C.NOP
+				// C.ADDI
+				break;
+			case 0b001:
+				// C.JAL
+				break;
+			case 0b010:
+				// C.LI
+				break;
+			case 0b011:
+				// C.ADDI16SP
+				// C.LUI
+				break;
+			case 0b100:
+				// C.SRLI
+				// C.SRAI
+				// C.ANDI
+				// C.SUB
+				// C.XOR
+				// C.OR
+				// C.AND
+				break;
+			case 0b101:
+				// C.J
+				break;
+			case 0b110:
+				// C.BEQZ
+				break;
+			case 0b111:
+				// C.BNEZ
+				break;
+		}
+	}else if(opcode == 2){
+		switch(funct3){
+			case 0b000:
+				// C.SLLI
+				break;
+			case 0b010:
+				// C.LWSP
+				break;
+			case 0b100:
+				// C.JR
+				// C.MV
+				// C.JALR
+				// C.ADD
+				break;
+			case 0b110:
+				// C.SWSP
+				break;
+		}
+	}
+
 	return 0;
 }
 
