@@ -1,7 +1,8 @@
 /*
-	This is just a skeleton. It DOES NOT implement all the requirements.
-	It only recognizes the RV32I "ADD", "SUB" and "ADDI" instructions only.
-	It prints "Unkown Instruction" for all other instructions!
+	TO DO:
+	Decompress RVC instructions
+	Execute
+	Read data section
 
 	References:
 	(1) The risc-v ISA Manual ver. 2.1 @ https://riscv.org/specifications/
