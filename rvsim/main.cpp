@@ -54,7 +54,7 @@ public:
 
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
-regfile regs;
+regfile x;
 
 void emitError(const char* s)
 {
@@ -228,6 +228,9 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x67) {	//I-type (JALR)
 		cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+	}
+	else if (opcode == 0x73) {	//(ECALL)
+			cout << "\tECALL\n";
 	}
 	else {
 		cout << "\tUnkown Instruction \n";
