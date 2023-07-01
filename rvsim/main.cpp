@@ -21,18 +21,18 @@ using namespace std;
 class regfile {
 
   struct bit32 {
-    int32_t value;
+    unsigned int value;
     bool is_const;
 
     template <typename T>
-    int32_t operator=(T x) {
+    unsigned int operator=(T x) {
       if (!is_const) {
         value = x;
       }
       return value;
     }
 
-    friend std::ostream &operator<<(std::ostream &os, const bit32 &reg) {
+    friend ostream &operator<<(ostream &os, const bit32 &reg) {
       os << reg.value;
       return os;
     }
@@ -63,7 +63,7 @@ void emitError(const char* s)
 }
 
 void printPrefix(unsigned int instA, unsigned int instW) {
-	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
+	cout << "0x" << hex << setfill('0') << setw(8) << instA << "\t0x" << setw(8) << instW;
 }
 
 void instDecExec(unsigned int instWord)
