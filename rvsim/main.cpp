@@ -12,11 +12,49 @@
 #include <fstream>
 #include "stdlib.h"
 #include <iomanip>
+#include <cstring> //for memset
 
 using namespace std;
 
+// data structure for registers
+
+class regfile {
+
+  struct bit32 {
+    int32_t value;
+    bool is_const;
+
+    template <typename T>
+    int32_t operator=(T x) {
+      if (!is_const) {
+        value = x;
+      }
+      return value;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const bit32 &reg) {
+      os << reg.value;
+      return os;
+    }
+  };
+
+  bit32 arr[32];
+public:
+  bit32 &operator[](int index) {
+    return arr[index];
+  }
+
+  regfile() {
+    memset(arr, 0, sizeof(arr));
+    arr[0].is_const = 1;
+  }
+
+};
+// initialise via rv registers; all regs would be 0
+
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
+regfile regs;
 
 void emitError(const char* s)
 {
