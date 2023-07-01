@@ -255,6 +255,8 @@ unsigned int decompress(unsigned int instWord) {
 			case 0b110:
 				// C.SW
 				break;
+			default:
+				cout << "\tUnkown Compressed Instruction \n";
 		}
 	}else if(opcode == 1){
 		switch(funct3){
@@ -290,6 +292,8 @@ unsigned int decompress(unsigned int instWord) {
 			case 0b111:
 				// C.BNEZ
 				break;
+			default:
+				cout << "\tUnkown Compressed Instruction \n";
 		}
 	}else if(opcode == 2){
 		switch(funct3){
@@ -308,7 +312,12 @@ unsigned int decompress(unsigned int instWord) {
 			case 0b110:
 				// C.SWSP
 				break;
+			default:
+				cout << "\tUnkown Compressed Instruction \n";
 		}
+	}
+	else {
+		cout << "\tUnkown Compressed Instruction \n";
 	}
 
 	return 0;
