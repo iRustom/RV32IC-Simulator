@@ -314,8 +314,13 @@ unsigned int decompress(unsigned int instWord) {
 				// C.JALR
 				// C.ADD
 				break;
-			case 0b110:
+			case 0b110: {
 				// C.SWSP
+				unsigned int rs2 = (instWord >> 2)& 0b11111;
+				unsigned int imm = (((instWord >> 9) & 0b1111) | (((instWord >> 7) & 0b11) << 4)) << 2;
+				unsigned int rs1 = 0b10;
+				instWord = 0b0100011 | (rs2 << 20) | (0b010 << 12) | (rs1 << 15) | ((imm & 0b011111) << 7) | (((imm & 0b11100000) >> 5) << 25);
+			}
 				break;
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
@@ -336,7 +341,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0101010111111110;
+	unsigned int instWord = 0b1100100010111110;
 	instWord = decompress(instWord);
 	instDecExec(instWord);
 
