@@ -325,10 +325,24 @@ unsigned int decompress(unsigned int instWord) {
 			}
 				break;
 			case 0b100:
-				// C.JR
-				// C.MV
-				// C.JALR
-				// C.ADD
+				unsigned int funct1, funct2;
+				funct1 = (instWord >> 12) & 0b1;
+				funct2 = (instWord >> 2) & 0b11111;
+				if (funct1 == 0 && funct2 == 0) {
+					// C.JR
+				}
+				else if (funct1 == 0) {
+					// C.MV
+				}
+				else if (funct1 == 1 && funct2 == 0) {
+					// C.JALR
+				}
+				else if (funct1 == 1) {
+					// C.ADD
+				}
+				else {
+					cout << "\tUnkown Compressed Instruction \n";
+				}
 				break;
 			case 0b110: {
 				// C.SWSP
