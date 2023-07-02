@@ -281,6 +281,7 @@ unsigned int decompress(unsigned int instWord) {
 				if (funct2 == 0b01)
 				{
 					// C.SRLI
+					unsigned int shamt = ((instWord & 0x007c) >> 2) | ((instWord & 0x1000) >> 7);
 				}
 				if (funct2 == 0b01)
 				{
