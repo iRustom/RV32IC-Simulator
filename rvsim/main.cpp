@@ -1,6 +1,5 @@
 /*
 	TO DO:
-	Decompress RVC instructions
 	Execute
 	Read data section
 
