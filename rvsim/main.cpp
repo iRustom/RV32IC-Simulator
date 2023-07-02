@@ -265,23 +265,25 @@ unsigned int decompress(unsigned int instWord) {
 				int32 |= ((nzuimm)<<20); // nzuimm for addi
 				instWord=int32;
 				break;
-        
+			}
 			case 0b010: {
 				// C.LW
 				unsigned int rd_3bit = ((instWord >> 2) & 0b111) + 8;	//+8 to get x8-x15.
 				unsigned int imm = (((instWord >> 6) & 0b1) | (((instWord >> 5) & 0b1) << 4) | (((instWord >> 10) & 0b111) << 1)) << 2;
 				unsigned int rs1_3bit = ((instWord >> 7) & 0b111) + 8;
 				instWord = 0b0000011 | (rd_3bit << 7) | (0b010 << 12) | (rs1_3bit << 15) | (imm << 20);
-			}
+			
 				break;
+			}
 			case 0b110: {
 				// C.SW
 				unsigned int rs2_3bit = ((instWord >> 2) & 0b111) + 8;	//+8 to get x8-x15.
 				unsigned int imm = (((instWord >> 6) & 0b1) | (((instWord >> 5) & 0b1) << 4) | (((instWord >> 10) & 0b111) << 1)) << 2;
 				unsigned int rs1_3bit = ((instWord >> 7) & 0b111) + 8;
 				instWord = 0b0100011 | (rs2_3bit << 20) | (0b010 << 12) | (rs1_3bit << 15) | ((imm & 0b11111) << 7) | (((imm & 0b1100000) >> 5) << 25);
-			}
+			
 				break;
+			}
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
 		}
@@ -311,14 +313,16 @@ unsigned int decompress(unsigned int instWord) {
 					inst32 |= ((imm)<<20); // imm for addi
 					instWord=inst32;
 				}
-			}
+			
 				break;
+			}
 			case 0b001: {
 				// C.JAL
 				unsigned int imm = (((instWord >> 3) & 0b111) | (((instWord >> 11) & 0b1) << 3) | (((instWord >> 2) & 0b1) << 4) | (((instWord >> 7) & 0b1) << 5) | (((instWord >> 6) & 0b1) << 6) | (((instWord >> 9) & 0b11) << 7) | (((instWord >> 8) & 0b1) << 9) | (((instWord >> 12) & 0b1) << 10)) << 1 | (((instWord >> 12) & 0b1) ? 0xFFFFF000 : 0x0);
 				instWord = 0b1101111 | (0b00000 << 7) | (imm & 0xFF000) | (((imm >> 11) & 0b1) << 20) | (((imm >> 1) & 0b1111111111) << 21) | ((imm >> 20) & 0b1) << 31;
-			}
+			
 				break;
+			}
 			case 0b010:
 			{
 				// C.LI
@@ -377,7 +381,7 @@ unsigned int decompress(unsigned int instWord) {
 				break;
 			}
 			case 0b100:
-				
+			{
 				if (funct2 == 0b00)
 				{
 					// C.SRLI
@@ -449,12 +453,14 @@ unsigned int decompress(unsigned int instWord) {
 				}
 				
 				break;
+			}
 			case 0b101: {
 				// C.J
 				unsigned int imm = (((instWord >> 3) & 0b111) | (((instWord >> 11) & 0b1) << 3) | (((instWord >> 2) & 0b1) << 4) | (((instWord >> 7) & 0b1) << 5) | (((instWord >> 6) & 0b1) << 6) | (((instWord >> 9) & 0b11) << 7) | (((instWord >> 8) & 0b1) << 9) | (((instWord >> 12) & 0b1) << 10)) << 1 | (((instWord >> 12) & 0b1) ? 0xFFFFF000 : 0x0);
 				instWord = 0b1101111 | (0b00000 << 7) | (imm & 0xFF000) | (((imm >> 11) & 0b1) << 20) | (((imm >> 1) & 0b1111111111) << 21) | ((imm >> 20) & 0b1) << 31;
-			}
+			
 				break;
+			}
 			case 0b110:
 			{
 				// C.BEQZ
@@ -532,16 +538,19 @@ unsigned int decompress(unsigned int instWord) {
 				inst32 |= ((shamt)<<20); // shamt for slli
 				instWord=inst32;
 				break;
-
-			case 0b010: {
+			}
+			case 0b010: 
+			{
 				// C.LWSP
 				unsigned int rd = instWord & 0xF80;
 				unsigned int imm = (((instWord >> 4) & 0b0111) | (((instWord >> 2) & 0b11) << 4) | (((instWord >> 12) & 0b1) << 3)) << 2;
 				unsigned int rs1 = 0b10;
 				instWord = 0b0000011 | rd | (0b010 << 12) | (rs1 << 15) | (imm << 20);
-			}
+			
 				break;
+			}
 			case 0b100:
+			{
 				unsigned int funct1, funct2;
 				funct1 = (instWord >> 12) & 0b1;
 				funct2 = (instWord >> 2) & 0b11111;
@@ -559,7 +568,7 @@ unsigned int decompress(unsigned int instWord) {
 				}
 				else if (funct1 == 1 && funct2 == 0) {
 					// C.JALR
-          unsigned int rs1 = (instWord >> 7) & 0b11111;
+        			unsigned int rs1 = (instWord >> 7) & 0b11111;
 					instWord = 0b1100111 | (0b1 << 7) | (0b000 << 12) | (rs1 << 15);
 				}
 				else if (funct1 == 1) {
@@ -572,14 +581,16 @@ unsigned int decompress(unsigned int instWord) {
 					cout << "\tUnkown Compressed Instruction \n";
 				}
 				break;
+			}
 			case 0b110: {
 				// C.SWSP
 				unsigned int rs2 = (instWord >> 2)& 0b11111;
 				unsigned int imm = (((instWord >> 9) & 0b1111) | (((instWord >> 7) & 0b11) << 4)) << 2;
 				unsigned int rs1 = 0b10;
 				instWord = 0b0100011 | (rs2 << 20) | (0b010 << 12) | (rs1 << 15) | ((imm & 0b011111) << 7) | (((imm & 0b11100000) >> 5) << 25);
-			}
+			
 				break;
+			}
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
 		}
