@@ -247,8 +247,20 @@ unsigned int decompress(unsigned int instWord) {
 	if(opcode == 0){
 		switch(funct3){
 			case 0b000:
+			{
 				// C.ADDI4SPN
+				// addi rd ′, x2, nzuimm[9:2]
+				unsigned int int32 = 0;
+				unsigned int rd = ((instWord >> 2) & 0b111)+8;
+				unsigned int nzuimm = 0 | (((instWord>>5)&0b1)<<3) | (((instWord>>6)&0b1)<<2) | (((instWord>>7)&0b1111)<<6) | (((instWord>>11)&0b11)<<4);
+				int32 |= 0b0010011; //opcode for addi
+				int32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+				int32 |= ((rd)<<7); // rd for addi
+				int32 |= ((2)<<15); // rs1 for addi
+				int32 |= ((nzuimm)<<20); // nzuimm for addi
+				instWord=int32;
 				break;
+			}
 			case 0b010:
 				// C.LW
 				break;
@@ -309,11 +321,26 @@ unsigned int decompress(unsigned int instWord) {
 			}
 			
 			case 0b011:
+			{
 				// C.ADDI16SP
 				// C.LUI
 				// detect if bit 7 to 11 in instword is 2
-				if((instWord>>7)&0b11111 == 2){
+				if(((instWord>>7)& 0b11111) == 2){
 					// C.ADDI16SP
+					// addi x2, x2, nzimm[9:4]
+					unsigned int nzimm = 0 | (((instWord>>2)&0b1)<<5) | (((instWord>>3)&0b11)<<7) | (((instWord>>5)&0b1)<<6) | (((instWord>>6)&0b1)<<4) | (((instWord>>12)&0b1)<<9);
+					// sign extend nzimm to 12 bits using nzimm[9]
+					if(nzimm & 0b1000000000){
+						nzimm |= 0b110000000000;
+					}
+					unsigned int rd = 2;
+					unsigned int inst32 = 0;
+					inst32 |= 0b0010011; //opcode for addi
+					inst32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+					inst32 |= ((rd)<<7); // rd for addi
+					inst32 |= ((rd)<<15); // rs1 for addi
+					inst32 |= ((nzimm)<<20); // nzimm for addi
+					instWord=inst32;
 				}else{
 					// C.LUI
 					// lui rd, nzimm[17:12]
@@ -330,6 +357,7 @@ unsigned int decompress(unsigned int instWord) {
 					instWord=inst32;
 				}
 				break;
+			}
 			case 0b100:
 				// C.SRLI
 				// C.SRAI
@@ -439,7 +467,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0000010100101001;
+	unsigned int instWord = 0b0000000000101000;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
