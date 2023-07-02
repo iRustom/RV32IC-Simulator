@@ -380,12 +380,19 @@ unsigned int decompress(unsigned int instWord) {
 				}
 				else if (funct1 == 0) {
 					// C.MV
+					// add rd, x0, rs2
+					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
+					unsigned int reg2 = ((instWord & 0x007C) >> 2);
+					instWord = (reg2 << 20) | (reg1 << 7) | 0x00000033;
 				}
 				else if (funct1 == 1 && funct2 == 0) {
 					// C.JALR
 				}
 				else if (funct1 == 1) {
 					// C.ADD
+					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
+					unsigned int reg2 = ((instWord & 0x007C) >> 2);
+					instWord = (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
 				}
 				else {
 					cout << "\tUnkown Compressed Instruction \n";
@@ -413,7 +420,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b1000110001100101;
+	unsigned int instWord = 0b1001010000100110;
 	instWord = decompress(instWord);
 	instDecExec(instWord);
 
