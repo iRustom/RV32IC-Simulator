@@ -244,6 +244,12 @@ unsigned int decompress(unsigned int instWord) {
 	// switch funct 3
 	unsigned int opcode = instWord & 0b11;
 	unsigned int funct3 = (instWord & 0xE000)>>13;
+
+
+	unsigned int funct2 = (instWord & 0x0C00) >> 10;
+	unsigned int funct6 = (instWord & 0xFC00) >> 10;
+	unsigned int funct2AL = (instWord & 0x0060) >> 5;
+	unsigned int funct4 = (instWord & 0xF000) >> 12;
 	if(opcode == 0){
 		switch(funct3){
 			case 0b000:
@@ -359,13 +365,77 @@ unsigned int decompress(unsigned int instWord) {
 				break;
 			}
 			case 0b100:
-				// C.SRLI
-				// C.SRAI
-				// C.ANDI
-				// C.SUB
-				// C.XOR
-				// C.OR
-				// C.AND
+				
+				if (funct2 == 0b00)
+				{
+					// C.SRLI
+					unsigned int shamt = ((instWord & 0x007c) >> 2); 
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
+					instWord = 0x00000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
+				}
+
+				if (funct2 == 0b01)
+				{
+					// C.SRAI
+					unsigned int shamt = ((instWord & 0x007c) >> 2); 
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
+					instWord = 0x40000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
+				}
+
+				if (funct2 == 0b10)
+				{
+					// C.ANDI
+					unsigned int imm = ((instWord & 0x007c) >> 2) | ((instWord & 0x1000) >> 7);
+					(instWord & 0x1000) ? (imm = imm | 0xFC0) : (imm = imm | 0x0);
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
+					instWord = (imm << 20) | (reg << 15) | 0x00000000 | (reg << 7) | 0x00000013;
+
+				}	
+
+				if (funct6 == 0b100011)
+				{
+					switch (funct2AL)
+					{
+					case 0b00:
+					{
+						// C.SUB
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x40000000 | (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
+						break;
+					}
+					case 0b01:
+					{
+						// C.XOR
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00004000 |(reg1 << 7) | 0x00000033;
+						break;
+					}
+					case 0b10:
+					{
+						// C.OR
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00006000 | (reg1 << 7) | 0x00000033;
+						break;
+					}
+					case 0b11:
+					{
+						// C.AND
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00007000 | (reg1 << 7) | 0x00000033;
+						break;
+					}
+					default:
+						break;
+					}
+
+
+				
+				}
+				
 				break;
 			case 0b101:
 				// C.J
@@ -452,10 +522,31 @@ unsigned int decompress(unsigned int instWord) {
 				// C.LWSP
 				break;
 			case 0b100:
-				// C.JR
-				// C.MV
-				// C.JALR
-				// C.ADD
+				unsigned int funct1, funct2;
+				funct1 = (instWord >> 12) & 0b1;
+				funct2 = (instWord >> 2) & 0b11111;
+				if (funct1 == 0 && funct2 == 0) {
+					// C.JR
+				}
+				else if (funct1 == 0) {
+					// C.MV
+					// add rd, x0, rs2
+					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
+					unsigned int reg2 = ((instWord & 0x007C) >> 2);
+					instWord = (reg2 << 20) | (reg1 << 7) | 0x00000033;
+				}
+				else if (funct1 == 1 && funct2 == 0) {
+					// C.JALR
+				}
+				else if (funct1 == 1) {
+					// C.ADD
+					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
+					unsigned int reg2 = ((instWord & 0x007C) >> 2);
+					instWord = (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
+				}
+				else {
+					cout << "\tUnkown Compressed Instruction \n";
+				}
 				break;
 			case 0b110:
 				// C.SWSP
@@ -479,8 +570,10 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
+
 	unsigned int instWord = 0b0000000110101010;
 	instDecExec(decompress(instWord));
+
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
