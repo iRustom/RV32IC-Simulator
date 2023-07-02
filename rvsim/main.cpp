@@ -275,13 +275,47 @@ unsigned int decompress(unsigned int instWord) {
 				// C.LUI
 				break;
 			case 0b100:
-				// C.SRLI
-				// C.SRAI
-				// C.ANDI
-				// C.SUB
-				// C.XOR
-				// C.OR
-				// C.AND
+				unsigned int funct2 = instWord & 0x0600;
+				unsigned int funct6 = instWord & 0xFE00;
+				unsigned int funct2AL = instWord & 0x0060;
+				if (funct2 == 0b01)
+				{
+					// C.SRLI
+				}
+				if (funct2 == 0b01)
+				{
+					// C.SRAI
+				}
+				if (funct2 == 0b10)
+				{
+					// C.ANDI
+				}
+				if (funct6 == 0b100011)
+				{
+					switch (funct2AL)
+					{
+					case 0b00:
+					{
+						// C.SUB
+					}
+					case 0b01:
+					{
+						// C.XOR
+					}
+					case 0b10:
+					{
+						// C.OR
+					}
+					case 0b11:
+					{
+						// C.AND
+					}
+					default:
+						break;
+					}
+				
+				}
+				
 				break;
 			case 0b101:
 				// C.J
