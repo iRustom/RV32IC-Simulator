@@ -257,8 +257,13 @@ unsigned int decompress(unsigned int instWord) {
 				instWord = 0b0000011 | (rd_3bit << 7) | (0b010 << 12) | (rs1_3bit << 15) | (imm << 20);
 			}
 				break;
-			case 0b110:
+			case 0b110: {
 				// C.SW
+				unsigned int rs2_3bit = ((instWord >> 2) & 0b111) + 8;	//+8 to get x8-x15.
+				unsigned int imm = (((instWord >> 6) & 0b1) | (((instWord >> 5) & 0b1) << 4) | (((instWord >> 10) & 0b111) << 1)) << 2;
+				unsigned int rs1_3bit = ((instWord >> 7) & 0b111) + 8;
+				instWord = 0b0100011 | (rs2_3bit << 20) | (0b010 << 12) | (rs1_3bit << 15) | ((imm & 0b11111) << 7) | (((imm & 0b1100000) >> 5) << 25);
+			}
 				break;
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
@@ -346,7 +351,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0101111110100100;
+	unsigned int instWord = 0b1101110001110000;
 	instWord = decompress(instWord);
 	instDecExec(instWord);
 
