@@ -261,8 +261,30 @@ unsigned int decompress(unsigned int instWord) {
 	}else if(opcode == 1){
 		switch(funct3){
 			case 0b000:
+			{
 				// C.NOP
 				// C.ADDI
+				if(instWord==0b0000000000000001){
+					// C.NOP
+					instWord = 0b00000000000000000000000000010011;
+				}else{
+					// C.ADDI
+					// addi rd, rd, imm[5:0]
+					unsigned int inst32 = 0;
+					unsigned int rd = (instWord >> 7) & 0b11111;
+					unsigned int imm = 0 | ((instWord>>2)&0b11111) | ((instWord>>7)&0b100000);
+					// sign extend imm to 12 bits using imm[5]
+					if(imm & 0b100000){
+						imm |= 0b111111000000;
+					}
+					inst32 |= 0b0010011; //opcode for addi
+					inst32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+					inst32 |= ((rd)<<7); // rd for addi
+					inst32 |= ((rd)<<15); // rs1 for addi
+					inst32 |= ((imm)<<20); // imm for addi
+					instWord=inst32;
+				}
+			}
 				break;
 			case 0b001:
 				// C.JAL
@@ -417,7 +439,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0110010010101001;
+	unsigned int instWord = 0b0000010100101001;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
