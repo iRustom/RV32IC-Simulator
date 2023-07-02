@@ -317,6 +317,30 @@ unsigned int decompress(unsigned int instWord) {
 			}
 			case 0b111:
 				// C.BNEZ
+				// bne rs1 ′, x0, offset[8:1]
+				unsigned int inst32 = 0;
+				unsigned int rs1dash = (instWord >> 7) & 0b111;
+				unsigned int offset = 0 | ((instWord & 0b100) <<3) | ((instWord & 0b11000) >> 2) | ((instWord & 0b1100000) << 1) | ((instWord & 0b110000000000) >> 7) | ((instWord & 0b1000000000000)>> 4);
+				// sign extend to 12 bits offset using offset[8]
+				if(offset & 0b100000000){
+					offset |= 0b1111000000000;
+				}
+
+				inst32 |= 0b1100011; //opcode for beq
+				inst32 |= (0b001<<12); // funct3 for beq, technically unrequired but kept for clarity
+				rs1dash = rs1dash + 8;
+				inst32 |= ((rs1dash)<<15); // rs1 for beq
+				inst32 |= (0b00000<<20); // rs2 for beq, technically unrequired but kept for clarity
+				// put offset into imm fields
+				// put offset [ 10: 5] into index 25 to 30 of inst32
+				inst32 |= ((offset & 0b11111100000) << 20);
+				// put offset [4:1] into index 8 to 11 of inst32
+				inst32 |= ((offset & 0b11110) << 7);
+				// put offset [11] into index 7 of inst32
+				inst32 |= ((offset & 0b100000000000) >> 4);
+				// put offset [12] into index 31 of inst32
+				inst32 |= ((offset & 0b1000000000000) << 19);
+				instWord=inst32;
 				break;
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
