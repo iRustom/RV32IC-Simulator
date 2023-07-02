@@ -289,6 +289,24 @@ unsigned int decompress(unsigned int instWord) {
 			case 0b011:
 				// C.ADDI16SP
 				// C.LUI
+				// detect if bit 7 to 11 in instword is 2
+				if((instWord>>7)&0b11111 == 2){
+					// C.ADDI16SP
+				}else{
+					// C.LUI
+					// lui rd, nzimm[17:12]
+					unsigned int nzimm = 0 | (((instWord>>2)&0b11111)) | (((instWord>>12)&0b1)<<5);
+					// sign extend nzimm to 20 bits using nzimm[5]
+					if(nzimm & 0b100000){
+						nzimm |= 0b111111111111111000000;
+					}
+					unsigned int rd = (instWord >> 7) & 0b11111;
+					unsigned int inst32 = 0;
+					inst32 |= 0b0110111; //opcode for lui
+					inst32 |= ((rd)<<7); // rd for lui
+					inst32 |= ((nzimm)<<12); // nzimm for lui
+					instWord=inst32;
+				}
 				break;
 			case 0b100:
 				// C.SRLI
@@ -399,7 +417,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0100010010010101;
+	unsigned int instWord = 0b0110010010101001;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
