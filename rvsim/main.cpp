@@ -434,8 +434,20 @@ unsigned int decompress(unsigned int instWord) {
 	}else if(opcode == 2){
 		switch(funct3){
 			case 0b000:
+			{
 				// C.SLLI
+				// slli rd, rd, shamt[5:0]
+				unsigned int inst32 = 0;
+				unsigned int rd = (instWord >> 7) & 0b11111;
+				unsigned int shamt = 0 | ((instWord>>2)&0b11111) | ((instWord>>7)&0b100000);
+				inst32 |= 0b0010011; //opcode for slli
+				inst32 |= (0b001<<12); // funct3 for slli
+				inst32 |= ((rd)<<7); // rd for slli
+				inst32 |= ((rd)<<15); // rs1 for slli
+				inst32 |= ((shamt)<<20); // shamt for slli
+				instWord=inst32;
 				break;
+			}
 			case 0b010:
 				// C.LWSP
 				break;
@@ -467,7 +479,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0000000000101000;
+	unsigned int instWord = 0b0000000110101010;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
