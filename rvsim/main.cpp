@@ -330,12 +330,16 @@ unsigned int decompress(unsigned int instWord) {
 				funct2 = (instWord >> 2) & 0b11111;
 				if (funct1 == 0 && funct2 == 0) {
 					// C.JR
+					unsigned int rs1 = (instWord >> 7) & 0b11111;
+					instWord = 0b1100111 | (0b0 << 7) | (0b000 << 12) | (rs1 << 15);
 				}
 				else if (funct1 == 0) {
 					// C.MV
 				}
 				else if (funct1 == 1 && funct2 == 0) {
 					// C.JALR
+					unsigned int rs1 = (instWord >> 7) & 0b11111;
+					instWord = 0b1100111 | (0b1 << 7) | (0b000 << 12) | (rs1 << 15);
 				}
 				else if (funct1 == 1) {
 					// C.ADD
@@ -371,7 +375,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b0010011000001001;
+	unsigned int instWord = 0b1001010100000010;
 	instWord = decompress(instWord);
 	instDecExec(instWord);
 
