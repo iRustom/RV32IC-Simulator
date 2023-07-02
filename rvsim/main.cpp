@@ -268,8 +268,24 @@ unsigned int decompress(unsigned int instWord) {
 				// C.JAL
 				break;
 			case 0b010:
+			{
 				// C.LI
+				// addi rd,x0, imm[5:0]
+				unsigned int inst32 = 0;
+			 	unsigned int rd = (instWord >> 7) & 0b11111;
+				unsigned int imm = 0 | ((instWord>>2)&0b11111) | ((instWord>>7)&0b100000);
+				// sign extend imm to 12 bits using imm[5]
+				if(imm & 0b100000){
+					imm |= 0b111111000000;
+				}
+				inst32 |= 0b0010011; //opcode for addi
+				inst32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+				inst32 |= ((rd)<<7); // rd for addi
+				inst32 |= ((imm)<<20); // imm for addi
+				instWord=inst32;
 				break;
+			}
+			
 			case 0b011:
 				// C.ADDI16SP
 				// C.LUI
@@ -316,6 +332,7 @@ unsigned int decompress(unsigned int instWord) {
 				break;
 			}
 			case 0b111:
+			{
 				// C.BNEZ
 				// bne rs1 ′, x0, offset[8:1]
 				unsigned int inst32 = 0;
@@ -342,6 +359,7 @@ unsigned int decompress(unsigned int instWord) {
 				inst32 |= ((offset & 0b1000000000000) << 19);
 				instWord=inst32;
 				break;
+			}
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
 		}
@@ -381,7 +399,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b1100000000110101;
+	unsigned int instWord = 0b0100010010010101;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
