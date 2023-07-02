@@ -1,6 +1,5 @@
 /*
 	TO DO:
-	Decompress RVC instructions
 	Execute
 	Read data section
 
@@ -244,11 +243,29 @@ unsigned int decompress(unsigned int instWord) {
 	// switch funct 3
 	unsigned int opcode = instWord & 0b11;
 	unsigned int funct3 = (instWord & 0xE000)>>13;
+
+
+	unsigned int funct2 = (instWord & 0x0C00) >> 10;
+	unsigned int funct6 = (instWord & 0xFC00) >> 10;
+	unsigned int funct2AL = (instWord & 0x0060) >> 5;
+	unsigned int funct4 = (instWord & 0xF000) >> 12;
 	if(opcode == 0){
 		switch(funct3){
 			case 0b000:
+			{
 				// C.ADDI4SPN
+				// addi rd ′, x2, nzuimm[9:2]
+				unsigned int int32 = 0;
+				unsigned int rd = ((instWord >> 2) & 0b111)+8;
+				unsigned int nzuimm = 0 | (((instWord>>5)&0b1)<<3) | (((instWord>>6)&0b1)<<2) | (((instWord>>7)&0b1111)<<6) | (((instWord>>11)&0b11)<<4);
+				int32 |= 0b0010011; //opcode for addi
+				int32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+				int32 |= ((rd)<<7); // rd for addi
+				int32 |= ((2)<<15); // rs1 for addi
+				int32 |= ((nzuimm)<<20); // nzuimm for addi
+				instWord=int32;
 				break;
+        
 			case 0b010: {
 				// C.LW
 				unsigned int rd_3bit = ((instWord >> 2) & 0b111) + 8;	//+8 to get x8-x15.
@@ -271,8 +288,30 @@ unsigned int decompress(unsigned int instWord) {
 	}else if(opcode == 1){
 		switch(funct3){
 			case 0b000:
+			{
 				// C.NOP
 				// C.ADDI
+				if(instWord==0b0000000000000001){
+					// C.NOP
+					instWord = 0b00000000000000000000000000010011;
+				}else{
+					// C.ADDI
+					// addi rd, rd, imm[5:0]
+					unsigned int inst32 = 0;
+					unsigned int rd = (instWord >> 7) & 0b11111;
+					unsigned int imm = 0 | ((instWord>>2)&0b11111) | ((instWord>>7)&0b100000);
+					// sign extend imm to 12 bits using imm[5]
+					if(imm & 0b100000){
+						imm |= 0b111111000000;
+					}
+					inst32 |= 0b0010011; //opcode for addi
+					inst32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+					inst32 |= ((rd)<<7); // rd for addi
+					inst32 |= ((rd)<<15); // rs1 for addi
+					inst32 |= ((imm)<<20); // imm for addi
+					instWord=inst32;
+				}
+			}
 				break;
 			case 0b001: {
 				// C.JAL
@@ -281,20 +320,134 @@ unsigned int decompress(unsigned int instWord) {
 			}
 				break;
 			case 0b010:
+			{
 				// C.LI
+				// addi rd,x0, imm[5:0]
+				unsigned int inst32 = 0;
+			 	unsigned int rd = (instWord >> 7) & 0b11111;
+				unsigned int imm = 0 | ((instWord>>2)&0b11111) | ((instWord>>7)&0b100000);
+				// sign extend imm to 12 bits using imm[5]
+				if(imm & 0b100000){
+					imm |= 0b111111000000;
+				}
+				inst32 |= 0b0010011; //opcode for addi
+				inst32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+				inst32 |= ((rd)<<7); // rd for addi
+				inst32 |= ((imm)<<20); // imm for addi
+				instWord=inst32;
 				break;
+			}
+			
 			case 0b011:
+			{
 				// C.ADDI16SP
 				// C.LUI
+				// detect if bit 7 to 11 in instword is 2
+				if(((instWord>>7)& 0b11111) == 2){
+					// C.ADDI16SP
+					// addi x2, x2, nzimm[9:4]
+					unsigned int nzimm = 0 | (((instWord>>2)&0b1)<<5) | (((instWord>>3)&0b11)<<7) | (((instWord>>5)&0b1)<<6) | (((instWord>>6)&0b1)<<4) | (((instWord>>12)&0b1)<<9);
+					// sign extend nzimm to 12 bits using nzimm[9]
+					if(nzimm & 0b1000000000){
+						nzimm |= 0b110000000000;
+					}
+					unsigned int rd = 2;
+					unsigned int inst32 = 0;
+					inst32 |= 0b0010011; //opcode for addi
+					inst32 |= (0b000<<12); // funct3 for addi, technically unrequired but kept for clarity
+					inst32 |= ((rd)<<7); // rd for addi
+					inst32 |= ((rd)<<15); // rs1 for addi
+					inst32 |= ((nzimm)<<20); // nzimm for addi
+					instWord=inst32;
+				}else{
+					// C.LUI
+					// lui rd, nzimm[17:12]
+					unsigned int nzimm = 0 | (((instWord>>2)&0b11111)) | (((instWord>>12)&0b1)<<5);
+					// sign extend nzimm to 20 bits using nzimm[5]
+					if(nzimm & 0b100000){
+						nzimm |= 0b111111111111111000000;
+					}
+					unsigned int rd = (instWord >> 7) & 0b11111;
+					unsigned int inst32 = 0;
+					inst32 |= 0b0110111; //opcode for lui
+					inst32 |= ((rd)<<7); // rd for lui
+					inst32 |= ((nzimm)<<12); // nzimm for lui
+					instWord=inst32;
+				}
 				break;
+			}
 			case 0b100:
-				// C.SRLI
-				// C.SRAI
-				// C.ANDI
-				// C.SUB
-				// C.XOR
-				// C.OR
-				// C.AND
+				
+				if (funct2 == 0b00)
+				{
+					// C.SRLI
+					unsigned int shamt = ((instWord & 0x007c) >> 2); 
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
+					instWord = 0x00000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
+				}
+
+				if (funct2 == 0b01)
+				{
+					// C.SRAI
+					unsigned int shamt = ((instWord & 0x007c) >> 2); 
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
+					instWord = 0x40000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
+				}
+
+				if (funct2 == 0b10)
+				{
+					// C.ANDI
+					unsigned int imm = ((instWord & 0x007c) >> 2) | ((instWord & 0x1000) >> 7);
+					(instWord & 0x1000) ? (imm = imm | 0xFC0) : (imm = imm | 0x0);
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
+					instWord = (imm << 20) | (reg << 15) | 0x00000000 | (reg << 7) | 0x00000013;
+
+				}	
+
+				if (funct6 == 0b100011)
+				{
+					switch (funct2AL)
+					{
+					case 0b00:
+					{
+						// C.SUB
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x40000000 | (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
+						break;
+					}
+					case 0b01:
+					{
+						// C.XOR
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00004000 |(reg1 << 7) | 0x00000033;
+						break;
+					}
+					case 0b10:
+					{
+						// C.OR
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00006000 | (reg1 << 7) | 0x00000033;
+						break;
+					}
+					case 0b11:
+					{
+						// C.AND
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00007000 | (reg1 << 7) | 0x00000033;
+						break;
+					}
+					default:
+						break;
+					}
+
+
+				
+				}
+				
 				break;
 			case 0b101: {
 				// C.J
@@ -303,19 +456,83 @@ unsigned int decompress(unsigned int instWord) {
 			}
 				break;
 			case 0b110:
+			{
 				// C.BEQZ
+				// beq rs1', x0, offset
+				unsigned int inst32 = 0;
+				unsigned int rs1dash = (instWord >> 7) & 0b111;
+				unsigned int offset = 0 | ((instWord & 0b100) <<3) | ((instWord & 0b11000) >> 2) | ((instWord & 0b1100000) << 1) | ((instWord & 0b110000000000) >> 7) | ((instWord & 0b1000000000000)>> 4);
+				// sign extend to 12 bits offset using offset[8]
+				if(offset & 0b100000000){
+					offset |= 0b1111000000000;
+				}
+
+				inst32 |= 0b1100011; //opcode for beq
+				inst32 |= (0b000<<12); // funct3 for beq, technically unrequired but kept for clarity
+				rs1dash = rs1dash + 8;
+				inst32 |= ((rs1dash)<<15); // rs1 for beq
+				inst32 |= (0b00000<<20); // rs2 for beq, technically unrequired but kept for clarity
+				// put offset into imm fields
+				// put offset [ 10: 5] into index 25 to 30 of inst32
+				inst32 |= ((offset & 0b11111100000) << 20);
+				// put offset [4:1] into index 8 to 11 of inst32
+				inst32 |= ((offset & 0b11110) << 7);
+				// put offset [11] into index 7 of inst32
+				inst32 |= ((offset & 0b100000000000) >> 4);
+				// put offset [12] into index 31 of inst32
+				inst32 |= ((offset & 0b1000000000000) << 19);
+				instWord=inst32;
 				break;
+			}
 			case 0b111:
+			{
 				// C.BNEZ
+				// bne rs1 ′, x0, offset[8:1]
+				unsigned int inst32 = 0;
+				unsigned int rs1dash = (instWord >> 7) & 0b111;
+				unsigned int offset = 0 | ((instWord & 0b100) <<3) | ((instWord & 0b11000) >> 2) | ((instWord & 0b1100000) << 1) | ((instWord & 0b110000000000) >> 7) | ((instWord & 0b1000000000000)>> 4);
+				// sign extend to 12 bits offset using offset[8]
+				if(offset & 0b100000000){
+					offset |= 0b1111000000000;
+				}
+
+				inst32 |= 0b1100011; //opcode for beq
+				inst32 |= (0b001<<12); // funct3 for beq, technically unrequired but kept for clarity
+				rs1dash = rs1dash + 8;
+				inst32 |= ((rs1dash)<<15); // rs1 for beq
+				inst32 |= (0b00000<<20); // rs2 for beq, technically unrequired but kept for clarity
+				// put offset into imm fields
+				// put offset [ 10: 5] into index 25 to 30 of inst32
+				inst32 |= ((offset & 0b11111100000) << 20);
+				// put offset [4:1] into index 8 to 11 of inst32
+				inst32 |= ((offset & 0b11110) << 7);
+				// put offset [11] into index 7 of inst32
+				inst32 |= ((offset & 0b100000000000) >> 4);
+				// put offset [12] into index 31 of inst32
+				inst32 |= ((offset & 0b1000000000000) << 19);
+				instWord=inst32;
 				break;
+			}
 			default:
 				cout << "\tUnkown Compressed Instruction \n";
 		}
 	}else if(opcode == 2){
 		switch(funct3){
 			case 0b000:
+			{
 				// C.SLLI
+				// slli rd, rd, shamt[5:0]
+				unsigned int inst32 = 0;
+				unsigned int rd = (instWord >> 7) & 0b11111;
+				unsigned int shamt = 0 | ((instWord>>2)&0b11111) | ((instWord>>7)&0b100000);
+				inst32 |= 0b0010011; //opcode for slli
+				inst32 |= (0b001<<12); // funct3 for slli
+				inst32 |= ((rd)<<7); // rd for slli
+				inst32 |= ((rd)<<15); // rs1 for slli
+				inst32 |= ((shamt)<<20); // shamt for slli
+				instWord=inst32;
 				break;
+
 			case 0b010: {
 				// C.LWSP
 				unsigned int rd = instWord & 0xF80;
@@ -335,14 +552,21 @@ unsigned int decompress(unsigned int instWord) {
 				}
 				else if (funct1 == 0) {
 					// C.MV
+					// add rd, x0, rs2
+					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
+					unsigned int reg2 = ((instWord & 0x007C) >> 2);
+					instWord = (reg2 << 20) | (reg1 << 7) | 0x00000033;
 				}
 				else if (funct1 == 1 && funct2 == 0) {
 					// C.JALR
-					unsigned int rs1 = (instWord >> 7) & 0b11111;
+          unsigned int rs1 = (instWord >> 7) & 0b11111;
 					instWord = 0b1100111 | (0b1 << 7) | (0b000 << 12) | (rs1 << 15);
 				}
 				else if (funct1 == 1) {
 					// C.ADD
+					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
+					unsigned int reg2 = ((instWord & 0x007C) >> 2);
+					instWord = (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
 				}
 				else {
 					cout << "\tUnkown Compressed Instruction \n";
@@ -374,10 +598,9 @@ int main(int argc, char* argv[]) {
 	//unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
-
-	unsigned int instWord = 0b1001010100000010;
-	instWord = decompress(instWord);
-	instDecExec(instWord);
+  
+	unsigned int instWord = 0b0000000110101010;
+	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
@@ -385,6 +608,7 @@ int main(int argc, char* argv[]) {
 
 	if (inFile.is_open())
 	{
+		
 		int fsize = inFile.tellg();
 
 		inFile.seekg(0, inFile.beg);
