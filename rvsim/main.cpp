@@ -356,7 +356,7 @@ unsigned int decompress(unsigned int instWord) {
 		cout << "\tUnkown Compressed Instruction \n";
 	}
 
-	return 0;
+	return instWord;
 }
 
 	
