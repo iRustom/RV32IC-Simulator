@@ -243,7 +243,7 @@ unsigned int decompress(unsigned int instWord) {
 	// if opcode
 	// switch funct 3
 	unsigned int opcode = instWord & 0b11;
-	unsigned int funct3 = instWord & 0xE000;
+	unsigned int funct3 = (instWord & 0xE000)>>13;
 	if(opcode == 0){
 		switch(funct3){
 			case 0b000:
