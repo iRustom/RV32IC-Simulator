@@ -313,21 +313,30 @@ unsigned int decompress(unsigned int instWord) {
 					case 0b00:
 					{
 						// C.SUB
-						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
 						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
 						instWord = 0x40000000 | (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
 					}
 					case 0b01:
 					{
 						// C.XOR
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00004000 |(reg1 << 7) | 0x00000033;
 					}
 					case 0b10:
 					{
 						// C.OR
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00006000 | (reg1 << 7) | 0x00000033;
 					}
 					case 0b11:
 					{
 						// C.AND
+						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
+						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
+						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00007000 | (reg1 << 7) | 0x00000033;
 					}
 					default:
 						break;
@@ -384,7 +393,7 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b1000110000000101;
+	unsigned int instWord = 0b1000110001100101;
 	instWord = decompress(instWord);
 	instDecExec(instWord);
 
