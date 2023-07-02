@@ -243,7 +243,7 @@ unsigned int decompress(unsigned int instWord) {
 	// if opcode
 	// switch funct 3
 	unsigned int opcode = instWord & 0b11;
-	unsigned int funct3 = instWord & 0xE000;
+	unsigned int funct3 = (instWord & 0xE000)>>13;
 	if(opcode == 0){
 		switch(funct3){
 			case 0b000:
@@ -288,6 +288,14 @@ unsigned int decompress(unsigned int instWord) {
 				break;
 			case 0b110:
 				// C.BEQZ
+				// beq rs1', x0, offset
+				unsigned int inst32 = 0;
+				inst32 |= 0b1100011; //opcode for beq
+				inst32 |= (0b000<<12); // funct3 for beq, technically unrequired but kept for clarity
+				inst32 |= (0b00000<<7); // rs1 for beq, technically unrequired but kept for clarity
+				inst32 |= (0b00000<<20); // rs2 for beq, technically unrequired but kept for clarity
+
+
 				break;
 			case 0b111:
 				// C.BNEZ
