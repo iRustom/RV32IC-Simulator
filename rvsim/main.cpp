@@ -275,13 +275,14 @@ unsigned int decompress(unsigned int instWord) {
 				// C.LUI
 				break;
 			case 0b100:
-				unsigned int funct2 = instWord & 0x0600;
-				unsigned int funct6 = instWord & 0xFE00;
-				unsigned int funct2AL = instWord & 0x0060;
+				unsigned int funct2 = (instWord & 0x0600) >> 9;
+				unsigned int funct6 = (instWord & 0xFE00) >> 9;
+				unsigned int funct2AL = (instWord & 0x0060) >> 5;
 				if (funct2 == 0b01)
 				{
 					// C.SRLI
-					unsigned int shamt = ((instWord & 0x007c) >> 2) | ((instWord & 0x1000) >> 7);
+					unsigned int shamt = ((instWord & 0x007c) << 14); //| ((instWord & 0x1000) << 14);
+					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
 				}
 				if (funct2 == 0b01)
 				{
