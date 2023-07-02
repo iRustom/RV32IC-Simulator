@@ -287,6 +287,7 @@ unsigned int decompress(unsigned int instWord) {
 				// C.J
 				break;
 			case 0b110:
+			{
 				// C.BEQZ
 				// beq rs1', x0, offset
 				unsigned int inst32 = 0;
@@ -299,7 +300,8 @@ unsigned int decompress(unsigned int instWord) {
 
 				inst32 |= 0b1100011; //opcode for beq
 				inst32 |= (0b000<<12); // funct3 for beq, technically unrequired but kept for clarity
-				inst32 |= ((rs1dash+0b1000)<<7); // rs1 for beq
+				rs1dash = rs1dash + 8;
+				inst32 |= ((rs1dash)<<15); // rs1 for beq
 				inst32 |= (0b00000<<20); // rs2 for beq, technically unrequired but kept for clarity
 				// put offset into imm fields
 				// put offset [ 10: 5] into index 25 to 30 of inst32
@@ -310,8 +312,9 @@ unsigned int decompress(unsigned int instWord) {
 				inst32 |= ((offset & 0b100000000000) >> 4);
 				// put offset [12] into index 31 of inst32
 				inst32 |= ((offset & 0b1000000000000) << 19);
-				return inst32;
+				instWord=inst32;
 				break;
+			}
 			case 0b111:
 				// C.BNEZ
 				break;
@@ -354,8 +357,8 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b00000001100001001000010001100111;
-	instDecExec(instWord);
+	unsigned int instWord = 0b1100000000110101;
+	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
@@ -363,6 +366,7 @@ int main(int argc, char* argv[]) {
 
 	if (inFile.is_open())
 	{
+		
 		int fsize = inFile.tellg();
 
 		inFile.seekg(0, inFile.beg);
