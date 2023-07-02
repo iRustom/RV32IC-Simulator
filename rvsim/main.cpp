@@ -249,6 +249,7 @@ unsigned int decompress(unsigned int instWord) {
 	unsigned int funct2 = (instWord & 0x0C00) >> 10;
 	unsigned int funct6 = (instWord & 0xFC00) >> 10;
 	unsigned int funct2AL = (instWord & 0x0060) >> 5;
+	unsigned int funct4 = (instWord & 0xF000) >> 12;
 	if(opcode == 0){
 		switch(funct3){
 			case 0b000:
@@ -288,6 +289,7 @@ unsigned int decompress(unsigned int instWord) {
 					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
 					instWord = 0x00000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
 				}
+
 				if (funct2 == 0b01)
 				{
 					// C.SRAI
@@ -295,6 +297,7 @@ unsigned int decompress(unsigned int instWord) {
 					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
 					instWord = 0x40000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
 				}
+
 				if (funct2 == 0b10)
 				{
 					// C.ANDI
@@ -306,6 +309,7 @@ unsigned int decompress(unsigned int instWord) {
 
 
 				}	
+
 				if (funct6 == 0b100011)
 				{
 					switch (funct2AL)
@@ -341,6 +345,8 @@ unsigned int decompress(unsigned int instWord) {
 					default:
 						break;
 					}
+
+
 				
 				}
 				
@@ -367,9 +373,18 @@ unsigned int decompress(unsigned int instWord) {
 				break;
 			case 0b100:
 				// C.JR
-				// C.MV
+
+				if (funct4 == 0b1000)
+				{
+					// C.MV
+				}
+
 				// C.JALR
-				// C.ADD
+
+				if (funct4 == 0b1001)
+				{
+					// C.ADD
+				}
 				break;
 			case 0b110:
 				// C.SWSP
