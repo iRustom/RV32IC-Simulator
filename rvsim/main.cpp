@@ -300,8 +300,13 @@ unsigned int decompress(unsigned int instWord) {
 			case 0b000:
 				// C.SLLI
 				break;
-			case 0b010:
+			case 0b010: {
 				// C.LWSP
+				unsigned int rd = instWord & 0xF80;
+				unsigned int imm = (((instWord >> 4) & 0b0111) | (((instWord >> 2) & 0b11) << 4) | (((instWord >> 12) & 0b1) << 3)) << 2;
+				unsigned int rs1 = 0b10;
+				instWord = 0b0000011 | rd | (0b010 << 12) | (rs1 << 15) | (imm << 20);
+			}
 				break;
 			case 0b100:
 				// C.JR
@@ -320,7 +325,7 @@ unsigned int decompress(unsigned int instWord) {
 		cout << "\tUnkown Compressed Instruction \n";
 	}
 
-	return 0;
+	return instWord;
 }
 
 	
@@ -331,7 +336,8 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b00000001100001001000010001100111;
+	unsigned int instWord = 0b0101010111111110;
+	instWord = decompress(instWord);
 	instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
