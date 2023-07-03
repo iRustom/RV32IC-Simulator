@@ -50,7 +50,7 @@ public:
   }
 
 };
-// initialise via rv registers; all regs would be 0
+// initialise via regfile registers; all regs would be 0
 
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
@@ -127,6 +127,19 @@ void ORI(unsigned int rd, unsigned int rs1, unsigned int imm)
 	x[rd].value = x[rs1].value | imm;
 	cout << endl << dec << (signed int)x[rs1].value << endl << (signed int)imm << endl << (signed int)x[rd].value << endl;
 }
+
+// execute Set B
+// ANDI
+// SLLI
+// SRLI
+// SRAI
+// SLTI
+// SLTIU
+// LB
+// LH
+// LW
+// LBU
+// LHU
 
 void instDecExec(unsigned int instWord)
 {
