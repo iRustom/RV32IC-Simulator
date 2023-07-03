@@ -117,6 +117,14 @@ void SLTU(unsigned int rd, unsigned int rs1, unsigned int rs2)
 void ADDI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
 	x[rd].value = x[rs1].value + imm;
+}
+void XORI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd].value = x[rs1].value ^ imm;
+}
+void ORI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd].value = x[rs1].value | imm;
 	cout << endl << dec << (signed int)x[rs1].value << endl << (signed int)imm << endl << (signed int)x[rd].value << endl;
 }
 
@@ -210,6 +218,7 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 4:	cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				XORI(rd, rs1, I_imm);
 			break;
 
 		case 5: if (funct7 == 32) {
@@ -221,6 +230,7 @@ void instDecExec(unsigned int instWord)
 			  break;
 
 		case 6: cout << "\tORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				ORI(rd, rs1, I_imm);
 			break;
 
 		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
@@ -675,8 +685,8 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
   
-	unsigned int instWord = 0b11111110110001001000010000010011;
-	x[9].value = 50;
+	unsigned int instWord = 0b11111110110001001110010000010011;
+	x[9].value = -50;
 	x[10].value = 0;
 	instDecExec(decompress(instWord));
 
