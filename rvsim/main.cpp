@@ -20,39 +20,40 @@ using namespace std;
 
 class regfile {
 
-  struct bit32 {
-    unsigned int value;
-    bool is_const;
+	struct bit32 {
+		unsigned int value;
+		bool is_const;
 
-    template <typename T>
-    unsigned int operator=(T x) {
-      if (!is_const) {
-        value = x;
-      }
-      return value;
-    }
+		template <typename T>
+		unsigned int operator=(T x) {
+			if (!is_const) {
+				value = x;
+			}
+			return value;
+		}
 
-    friend ostream &operator<<(ostream &os, const bit32 &reg) {
-      os << reg.value;
-      return os;
-    }
-  };
+		friend ostream& operator<<(ostream& os, const bit32& reg) {
+			os << reg.value;
+			return os;
+		}
+	};
 
-  bit32 arr[32];
+	bit32 arr[32];
 public:
-  bit32 &operator[](int index) {
-    return arr[index];
-  }
+	bit32& operator[](int index) {
+		return arr[index];
+	}
 
-  regfile() {
-    memset(arr, 0, sizeof(arr));
-    arr[0].is_const = 1;
-  }
+	regfile() {
+		memset(arr, 0, sizeof(arr));
+		arr[0].is_const = 1;
+	}
 
 };
 // initialise via regfile registers; all regs would be 0
 
 unsigned int pc;
+unsigned int nextPC;
 unsigned char memory[(16 + 64) * 1024];
 regfile x;
 
@@ -191,6 +192,103 @@ void LHU(unsigned int rd, unsigned int rs1, unsigned int imm){
 	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
 }
 
+void SB(unsigned int rs2, unsigned int rs1, int S_imm) {
+	unsigned int data = x[rs2].value;
+	unsigned int base_address = x[rs1].value + S_imm;
+	memory[base_address] = data & 0xFF;
+}
+
+void SH(unsigned int rs2, unsigned int rs1, int S_imm) {
+	unsigned int data = x[rs2].value;
+	unsigned int base_address = x[rs1].value + S_imm;
+	memory[base_address] = data & 0xFF;
+	memory[base_address + 1] = (data >> 8) & 0xFF;
+}
+
+void SW(unsigned int rs2, unsigned int rs1, int S_imm) {
+	unsigned int data = x[rs2].value;
+	unsigned int base_address = x[rs1].value + S_imm;
+	memory[base_address] = data & 0xFF;
+	memory[base_address + 1] = (data >> 8) & 0xFF;
+	memory[base_address + 2] = (data >> 16) & 0xFF;
+	memory[base_address + 3] = (data >> 24) & 0xFF;
+}
+
+void BEQ(unsigned int rs1, unsigned int rs2, int B_imm) {
+	if (x[rs1].value == x[rs2].value) {
+		nextPC = pc + B_imm;
+	}
+}
+
+void BNE(unsigned int rs1, unsigned int rs2, int B_imm) {
+	if (x[rs1].value != x[rs2].value) {
+		nextPC = pc + B_imm;
+	}
+}
+
+void BLT(unsigned int rs1, unsigned int rs2, int B_imm) {
+	if ((int)(x[rs1].value) < (int)(x[rs2].value)) {
+		nextPC = pc + B_imm;
+	}
+}
+
+void BGE(unsigned int rs1, unsigned int rs2, int B_imm) {
+	if ((int)(x[rs1].value) >= (int)(x[rs2].value)) {
+		nextPC = pc + B_imm;
+	}
+}
+
+void BLTU(unsigned int rs1, unsigned int rs2, int B_imm) {
+	if (x[rs1].value < x[rs2].value) {
+		nextPC = pc + B_imm;
+	}
+}
+
+void BGEU(unsigned int rs1, unsigned int rs2, int B_imm) {
+	if (x[rs1].value >= x[rs2].value) {
+		nextPC = pc + B_imm;
+	}
+}
+
+void AUIPC(unsigned int rd, int U_imm) {
+	nextPC = pc + U_imm;
+	x[rd] = nextPC;
+}
+
+void LUI(unsigned int rd, int U_imm) {
+	x[rd] = U_imm;
+}
+
+void JAL(unsigned int rd, int J_imm) {
+	x[rd] = nextPC;
+	nextPC = pc + J_imm;
+}
+
+void JALR(unsigned int rd, unsigned int rs1, int I_imm) {
+	x[rd] = nextPC;
+	nextPC = (x[rs1].value + I_imm) & 0xFFFFFFFE;	/*"The target address is obtained by adding the sign - extended 12 - bit I - immediate
+													to the register rs1, then setting the least - significant bit of the result to zero." from rv documentation*/
+}
+
+void ECALL() {
+	switch (x[17].value) {
+	case 1: cout << dec << (int)x[10].value;
+		break;
+	case 4: {
+		unsigned int base_address = x[10].value;
+		while (memory[base_address] != '\0') {
+			cout << memory[base_address];
+			base_address++;
+		}
+	}
+		  break;
+	case 10: exit(0);
+		break;
+
+	default: emitError("Illegal ecall number\n");
+	}
+}
+
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
@@ -208,7 +306,7 @@ void instDecExec(unsigned int instWord)
 
 	// â€” inst[31] â€” inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6);
+	B_imm = (rd & 0b11110) | ((funct7 & 0b0111111) << 5) | ((rd & 0b00001) << 11) | ((funct7 & 0b1000000) << 6) | ((instWord >> 31) ? 0xFFFFF000 : 0x0);
 	S_imm = ((funct7 <<5) | rd) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	U_imm = (instWord & 0xFFFFF000);
 	J_imm = (((instWord>>21)&0x3FF)<<1) | (((instWord>>20)&0x1)<<11) | (((instWord>>12)&0xFF)<<12) | ((instWord>>31)?0xFFF80000:0x0);
@@ -225,7 +323,7 @@ void instDecExec(unsigned int instWord)
 			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
 			ADD(rd, rs1, rs2);
 		}
-			  break;
+			break;
 
 		case 1: cout << "\tSLL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
 			SLL(rd, rs1, rs2);
@@ -338,28 +436,58 @@ void instDecExec(unsigned int instWord)
 		// rd is now imm[4:0]
 		// funct7 is now imm[11:5]
 		switch(funct3){
-			case 0: cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
-				break;
-			case 1: cout << "\tSH\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
-				break;
-			case 2: cout << "\tSW\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 <<")\n";
-				break;
+		case 0: {
+			cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
+			SB(rs2, rs1, S_imm);
+			}
+			break;
+
+		case 1: {
+			cout << "\tSH\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
+			SH(rs2, rs1, S_imm);
+			}
+			break;
+
+		case 2: {
+			cout << "\tSW\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
+			SW(rs2, rs1, S_imm);
+			}
+			break;
+
 			default: cout << "\tUnkown S Instruction \n";
 		}
 	}
 	else if (opcode == 0x63) {	//B-type
 	switch (funct3) {
-	case 0: cout << "\tBEQ\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 0: {
+		cout << "\tBEQ\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		BEQ(rs1, rs2, B_imm);
+	}
 		break;
-	case 1: cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 1: {
+		cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		BNE(rs1, rs2, B_imm);
+	}
 		break;
-	case 4: cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 4: {
+		cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		BLT(rs1, rs2, B_imm);
+	}
 		break;
-	case 5: cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 5: {
+		cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		BGE(rs1, rs2, B_imm);
+	}
 		break;
-	case 6:cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 6: {
+		cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		BLTU(rs1, rs2, B_imm);
+	}
 		break;
-	case 7: cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+	case 7: {
+		cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		BGEU(rs1, rs2, B_imm);
+	}
 		break;
 	default:
 		cout << "\tUnkown B Instruction \n";
@@ -367,18 +495,23 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
 		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
+		AUIPC(rd, U_imm);
 	}
 	else if (opcode == 0x37) {	//U-type (LUI)
 		cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
+		LUI(rd, U_imm);
 	}
 	else if (opcode == 0x6F) {	//J-type (JAL)
 		cout << "\tJAL\tx" << dec << rd << ", " << dec << (int)J_imm << "\n";
+		JAL(rd, J_imm);
 	}
 	else if (opcode == 0x67) {	//I-type (JALR)
 		cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		JALR(rd, rs1, I_imm);
 	}
 	else if (opcode == 0x73) {	//(ECALL)
-			cout << "\tECALL\n";
+		cout << "\tECALL\n";
+		ECALL();
 	}
 	else {
 		cout << "\tUnkown Instruction \n";
@@ -757,7 +890,9 @@ int main(int argc, char* argv[]) {
 	unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
-  
+
+	unsigned int instWord = 0b00000000000000000000000001110011;
+	instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
@@ -778,13 +913,13 @@ int main(int argc, char* argv[]) {
 					(((unsigned char)memory[pc + 1]) << 8) |
 					(((unsigned char)memory[pc + 2]) << 16) |
 					(((unsigned char)memory[pc + 3]) << 24);
-				pc += 4;
+				nextPC = pc + 4;
 			}
 			else {
 				instWord = (unsigned char)memory[pc] |
 					(((unsigned char)memory[pc + 1]) << 8);
-				// instword = decompress(instWord);
-				pc += 2;
+				instWord = decompress(instWord);
+				nextPC = pc + 2;
 			}
 
 			/* removed to allow for compressed instructions
@@ -797,6 +932,7 @@ int main(int argc, char* argv[]) {
 			// remove the following line once you have a complete simulator
 			if (pc == 32) break;			// stop when PC reached address 32
 			instDecExec(instWord);
+			pc = nextPC;
 		}
 	}
 	else emitError("Cannot access input file\n");
