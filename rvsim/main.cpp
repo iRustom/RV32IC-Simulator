@@ -66,6 +66,68 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << setfill('0') << setw(8) << instA << "\t0x" << setw(8) << instW;
 }
 
+void ADD(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value + x[rs2].value; 
+	
+}
+void SUB(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value - x[rs2].value;
+	
+
+}
+void XOR(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value ^ x[rs2].value;
+}
+void OR(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value | x[rs2].value;
+	
+}
+void AND(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value & x[rs2].value;
+	
+}
+
+void SLL(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value << x[rs2].value;
+}
+
+void SRL(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value >> x[rs2].value;
+}
+
+void SRA(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = (signed int) x[rs1].value >> x[rs2].value;
+}
+void SLT(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = ((signed int)x[rs1].value < (signed int)x[rs2].value) ? 1:0;
+}
+void SLTU(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = (x[rs1].value < x[rs2].value) ? 1 : 0;
+}
+void ADDI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd].value = x[rs1].value + imm;
+}
+void XORI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd].value = x[rs1].value ^ imm;
+}
+void ORI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd].value = x[rs1].value | imm;
+	cout << endl << dec << (signed int)x[rs1].value << endl << (signed int)imm << endl << (signed int)x[rd].value << endl;
+}
+
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
@@ -94,36 +156,46 @@ void instDecExec(unsigned int instWord)
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
 			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd, rs1, and rs2 as decimal
+			SUB(rd, rs1, rs2);
 		}
 			  else {
 			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			ADD(rd, rs1, rs2);
 		}
 			  break;
 
 		case 1: cout << "\tSLL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			SLL(rd, rs1, rs2);
 			break;
 
 		case 2: cout << "\tSLT\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				SLT(rd, rs1, rs2);
 			break;
 
 		case 3: cout << "\tSLTU\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				SLTU(rd, rs1, rs2);
 			break;
 
 		case 4: cout << "\tXOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				XOR(rd, rs1, rs2);
 			break;
 
 		case 5: if (funct7 == 32) {
 			cout << "\tSRA\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			SRA(rd, rs1, rs2);
 		}
 			  else {
 			cout << "\tSRL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			SRL(rd, rs1, rs2);
 		}
 			  break;
 
 		case 6: cout << "\tOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				OR(rd, rs1, rs2);
 			break;
 
 		case 7: cout << "\tAND\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				AND(rd, rs1, rs2);
 			break;
 
 		default:
@@ -133,6 +205,7 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
 		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";	//added "dec" to output rd and rs1 as decimal
+			ADDI(rd, rs1, I_imm);
 			break;
 
 		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
@@ -145,6 +218,7 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 4:	cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				XORI(rd, rs1, I_imm);
 			break;
 
 		case 5: if (funct7 == 32) {
@@ -156,6 +230,7 @@ void instDecExec(unsigned int instWord)
 			  break;
 
 		case 6: cout << "\tORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				ORI(rd, rs1, I_imm);
 			break;
 
 		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
@@ -610,7 +685,9 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
   
-	unsigned int instWord = 0b0000000110101010;
+	unsigned int instWord = 0b11111110110001001110010000010011;
+	x[9].value = -50;
+	x[10].value = 0;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
