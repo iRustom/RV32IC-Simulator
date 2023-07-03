@@ -765,13 +765,11 @@ int main(int argc, char* argv[]) {
 	memory[90] = 0x34;
 	memory[91] = 0x12;
 	memory[92] = 0x78;
-	
+
 	memory[96] = 0x78;
 	memory[97] = 0x56;
 	x[4].value = 90;
-	LW(5,4,-1);
-	//LW(7, 8, 9);
-	//LBU(10, 11, 12);
+	LBU(5, 4, -1);
 	//LHU(13, 14, 15);
 	
 	cout << endl<< hex << (int)x[5].value << endl;
