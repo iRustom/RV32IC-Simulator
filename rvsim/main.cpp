@@ -251,8 +251,7 @@ void BGEU(unsigned int rs1, unsigned int rs2, int B_imm) {
 }
 
 void AUIPC(unsigned int rd, int U_imm) {
-	nextPC = pc + U_imm;
-	x[rd] = nextPC;
+	x[rd] = pc + U_imm;
 }
 
 void LUI(unsigned int rd, int U_imm) {
@@ -295,7 +294,7 @@ void instDecExec(unsigned int instWord)
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
 	unsigned int address;
 
-	unsigned int instPC = pc - 4;
+	unsigned int instPC = pc;
 
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
@@ -894,9 +893,9 @@ int main(int argc, char* argv[]) {
 	//unsigned int instWord = 0b00000000000000000000000001110011;
 	//instDecExec(instWord);
 
-	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
+	//if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
-	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
+	inFile.open("C:\\Users\\bodyb\\source\\repos\\rvsim\\Binary_Files\\t0.bin", ios::in | ios::binary | ios::ate);
 
 	if (inFile.is_open())
 	{
@@ -930,7 +929,7 @@ int main(int argc, char* argv[]) {
 			pc += 4;*/
 
 			// remove the following line once you have a complete simulator
-			if (pc == 32) break;			// stop when PC reached address 32
+			if (pc > 0x00000068) break;			// stop when PC reached address 32
 			instDecExec(instWord);
 			pc = nextPC;
 		}
