@@ -50,7 +50,7 @@ public:
   }
 
 };
-// initialise via rv registers; all regs would be 0
+// initialise via regfile registers; all regs would be 0
 
 unsigned int pc;
 unsigned char memory[(16 + 64) * 1024];
@@ -68,64 +68,127 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 
 void ADD(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value + x[rs2].value; 
+	x[rd] = x[rs1].value + x[rs2].value; 
 	
 }
 void SUB(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value - x[rs2].value;
+	x[rd] = x[rs1].value - x[rs2].value;
 	
 
 }
 void XOR(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value ^ x[rs2].value;
+	x[rd] = x[rs1].value ^ x[rs2].value;
 }
 void OR(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value | x[rs2].value;
+	x[rd] = x[rs1].value | x[rs2].value;
 	
 }
 void AND(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value & x[rs2].value;
+	x[rd] = x[rs1].value & x[rs2].value;
 	
 }
 
 void SLL(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value << x[rs2].value;
+	x[rd] = x[rs1].value << x[rs2].value;
 }
 
 void SRL(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value >> x[rs2].value;
+	x[rd] = x[rs1].value >> x[rs2].value;
 }
 
 void SRA(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = (signed int) x[rs1].value >> x[rs2].value;
+	x[rd] = (signed int) x[rs1].value >> x[rs2].value;
 }
 void SLT(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = ((signed int)x[rs1].value < (signed int)x[rs2].value) ? 1:0;
+	x[rd] = ((signed int)x[rs1].value < (signed int)x[rs2].value) ? 1:0;
 }
 void SLTU(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = (x[rs1].value < x[rs2].value) ? 1 : 0;
+	x[rd] = (x[rs1].value < x[rs2].value) ? 1 : 0;
 }
 void ADDI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
-	x[rd].value = x[rs1].value + imm;
+	x[rd] = x[rs1].value + imm;
 }
 void XORI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
-	x[rd].value = x[rs1].value ^ imm;
+	x[rd] = x[rs1].value ^ imm;
 }
 void ORI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
-	x[rd].value = x[rs1].value | imm;
-	cout << endl << dec << (signed int)x[rs1].value << endl << (signed int)imm << endl << (signed int)x[rd].value << endl;
+	x[rd] = x[rs1].value | imm;
+}
+
+// execute Set B
+// ANDI
+void ANDI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = x[rs1].value & imm;
+}
+// SLLI
+void SLLI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = x[rs1].value << imm;
+}
+// SRLI
+void SRLI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = x[rs1].value >> imm;
+}
+// SRAI
+void SRAI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = (signed int)x[rs1].value >> imm;
+}
+// SLTI
+void SLTI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = ((signed int)x[rs1].value < (signed int)imm) ? 1 : 0;
+}
+// SLTIU
+void SLTIU(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = (x[rs1].value < imm) ? 1 : 0;
+}
+// LB
+void LB(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// sign extend to 32 bits
+	if(x[rd].value & 0b10000000){
+		x[rd].value |= 0xFFFFFF00;
+	}
+}
+// LH
+void LH(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// load second byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
+	// sign extend to 32 bits
+	if(x[rd].value & 0b1000000000000000){
+		x[rd].value |= 0xFFFF0000;
+	}
+}
+// LW
+void LW(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// load second byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
+	// load third byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 2] << 16;
+	// load fourth byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 3] << 24;
+}
+// LBU
+void LBU(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+}
+// LHU
+void LHU(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// load second byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
 }
 
 void instDecExec(unsigned int instWord)
@@ -209,12 +272,15 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+			SLLI(rd, rs1, I_imm&0x01F);
 			break;
 
 		case 2:	cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			SLTI(rd, rs1, I_imm);
 			break;
 
 		case 3:	cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			SLTIU(rd, rs1, I_imm);
 			break;
 
 		case 4:	cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
@@ -223,9 +289,10 @@ void instDecExec(unsigned int instWord)
 
 		case 5: if (funct7 == 32) {
 			cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
-		}
-			  else {
+			SRAI(rd, rs1, I_imm&0x01F);
+		}else {
 			cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+			SRLI(rd, rs1, I_imm&0x01F);
 		}
 			  break;
 
@@ -234,6 +301,7 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				ANDI(rd, rs1, I_imm);
 			break;
 
 		default:
@@ -243,18 +311,23 @@ void instDecExec(unsigned int instWord)
 	else if(opcode == 0x3) {	// I-type load instructions
 		switch (funct3) {
 		case 0: cout << "\tLB\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";	//added "dec" to output rd, rs1, and the offset as decimal
+			LB(rd, rs1, I_imm);
 			break;
 
 		case 1: cout << "\tLH\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LH(rd, rs1, I_imm);
 			break;
 
 		case 2: cout << "\tLW\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LW(rd, rs1, I_imm);
 			break;
 
 		case 4: cout << "\tLBU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LBU(rd, rs1, I_imm);
 			break;
 
 		case 5: cout << "\tLHU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LHU(rd, rs1, I_imm);
 			break;
 
 		default:
@@ -681,14 +754,10 @@ unsigned int decompress(unsigned int instWord) {
 
 int main(int argc, char* argv[]) {
 
-	//unsigned int instWord = 0;
+	unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
   
-	unsigned int instWord = 0b11111110110001001110010000010011;
-	x[9].value = -50;
-	x[10].value = 0;
-	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
