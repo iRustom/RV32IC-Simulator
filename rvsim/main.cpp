@@ -895,7 +895,7 @@ int main(int argc, char* argv[]) {
 	//unsigned int instWord = 0b00000000000000000000000001110011;
 	//instDecExec(instWord);
 
-	//if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
+	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
 	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 
