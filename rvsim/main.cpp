@@ -762,15 +762,14 @@ int main(int argc, char* argv[]) {
   
 	// code to test LB, LH, LW, LBU, LHU
 	memory[89] = 0xFF;
-	memory[90] = 0x34;
+	memory[90] = 0xF4;
 	memory[91] = 0x12;
 	memory[92] = 0x78;
 
 	memory[96] = 0x78;
 	memory[97] = 0x56;
 	x[4].value = 90;
-	LBU(5, 4, -1);
-	//LHU(13, 14, 15);
+	LHU(5, 4, -1);
 	
 	cout << endl<< hex << (int)x[5].value << endl;
 
