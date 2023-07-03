@@ -50,7 +50,7 @@ public:
 	}
 
 };
-// initialise via rv registers; all regs would be 0
+// initialise via regfile registers; all regs would be 0
 
 unsigned int pc;
 unsigned int nextPC;
@@ -65,6 +65,131 @@ void emitError(const char* s)
 
 void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << setfill('0') << setw(8) << instA << "\t0x" << setw(8) << instW;
+}
+
+void ADD(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value + x[rs2].value; 
+	
+}
+void SUB(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value - x[rs2].value;
+	
+
+}
+void XOR(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value ^ x[rs2].value;
+}
+void OR(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value | x[rs2].value;
+	
+}
+void AND(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value & x[rs2].value;
+	
+}
+
+void SLL(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value << x[rs2].value;
+}
+
+void SRL(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = x[rs1].value >> x[rs2].value;
+}
+
+void SRA(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = (signed int) x[rs1].value >> x[rs2].value;
+}
+void SLT(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = ((signed int)x[rs1].value < (signed int)x[rs2].value) ? 1:0;
+}
+void SLTU(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd] = (x[rs1].value < x[rs2].value) ? 1 : 0;
+}
+void ADDI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd] = x[rs1].value + imm;
+}
+void XORI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd] = x[rs1].value ^ imm;
+}
+void ORI(unsigned int rd, unsigned int rs1, unsigned int imm)
+{
+	x[rd] = x[rs1].value | imm;
+}
+
+// execute Set B
+// ANDI
+void ANDI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = x[rs1].value & imm;
+}
+// SLLI
+void SLLI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = x[rs1].value << imm;
+}
+// SRLI
+void SRLI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = x[rs1].value >> imm;
+}
+// SRAI
+void SRAI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = (signed int)x[rs1].value >> imm;
+}
+// SLTI
+void SLTI(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = ((signed int)x[rs1].value < (signed int)imm) ? 1 : 0;
+}
+// SLTIU
+void SLTIU(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = (x[rs1].value < imm) ? 1 : 0;
+}
+// LB
+void LB(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// sign extend to 32 bits
+	if(x[rd].value & 0b10000000){
+		x[rd].value |= 0xFFFFFF00;
+	}
+}
+// LH
+void LH(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// load second byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
+	// sign extend to 32 bits
+	if(x[rd].value & 0b1000000000000000){
+		x[rd].value |= 0xFFFF0000;
+	}
+}
+// LW
+void LW(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// load second byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
+	// load third byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 2] << 16;
+	// load fourth byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 3] << 24;
+}
+// LBU
+void LBU(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+}
+// LHU
+void LHU(unsigned int rd, unsigned int rs1, unsigned int imm){
+	x[rd] = memory[x[rs1].value + (int)imm];
+	// load second byte
+	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
 }
 
 void SB(unsigned int rs2, unsigned int rs1, int S_imm) {
@@ -192,36 +317,46 @@ void instDecExec(unsigned int instWord)
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
 			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd, rs1, and rs2 as decimal
+			SUB(rd, rs1, rs2);
 		}
 			  else {
 			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			ADD(rd, rs1, rs2);
 		}
 			break;
 
 		case 1: cout << "\tSLL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			SLL(rd, rs1, rs2);
 			break;
 
 		case 2: cout << "\tSLT\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				SLT(rd, rs1, rs2);
 			break;
 
 		case 3: cout << "\tSLTU\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				SLTU(rd, rs1, rs2);
 			break;
 
 		case 4: cout << "\tXOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				XOR(rd, rs1, rs2);
 			break;
 
 		case 5: if (funct7 == 32) {
 			cout << "\tSRA\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			SRA(rd, rs1, rs2);
 		}
 			  else {
 			cout << "\tSRL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			SRL(rd, rs1, rs2);
 		}
 			  break;
 
 		case 6: cout << "\tOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				OR(rd, rs1, rs2);
 			break;
 
 		case 7: cout << "\tAND\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				AND(rd, rs1, rs2);
 			break;
 
 		default:
@@ -231,32 +366,40 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
 		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";	//added "dec" to output rd and rs1 as decimal
+			ADDI(rd, rs1, I_imm);
 			break;
 
 		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+			SLLI(rd, rs1, I_imm&0x01F);
 			break;
 
 		case 2:	cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			SLTI(rd, rs1, I_imm);
 			break;
 
 		case 3:	cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+			SLTIU(rd, rs1, I_imm);
 			break;
 
 		case 4:	cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				XORI(rd, rs1, I_imm);
 			break;
 
 		case 5: if (funct7 == 32) {
 			cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
-		}
-			  else {
+			SRAI(rd, rs1, I_imm&0x01F);
+		}else {
 			cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+			SRLI(rd, rs1, I_imm&0x01F);
 		}
 			  break;
 
 		case 6: cout << "\tORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				ORI(rd, rs1, I_imm);
 			break;
 
 		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+				ANDI(rd, rs1, I_imm);
 			break;
 
 		default:
@@ -266,18 +409,23 @@ void instDecExec(unsigned int instWord)
 	else if(opcode == 0x3) {	// I-type load instructions
 		switch (funct3) {
 		case 0: cout << "\tLB\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";	//added "dec" to output rd, rs1, and the offset as decimal
+			LB(rd, rs1, I_imm);
 			break;
 
 		case 1: cout << "\tLH\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LH(rd, rs1, I_imm);
 			break;
 
 		case 2: cout << "\tLW\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LW(rd, rs1, I_imm);
 			break;
 
 		case 4: cout << "\tLBU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LBU(rd, rs1, I_imm);
 			break;
 
 		case 5: cout << "\tLHU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+			LHU(rd, rs1, I_imm);
 			break;
 
 		default:
@@ -739,28 +887,9 @@ unsigned int decompress(unsigned int instWord) {
 
 int main(int argc, char* argv[]) {
 
-	//unsigned int instWord = 0;
+	unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
-	pc = 50000;
-	x[1] = -2;
-	x[2] = 40;
-	nextPC = 4;
-	x[10] = 5;
-	x[17] = 4;
-	memory[5] = 'H';
-	memory[6] = 'e';
-	memory[7] = 'l';
-	memory[8] = 'l';
-	memory[9] = 'o';
-	memory[10] = ' ';
-	memory[11] = 'W';
-	memory[12] = 'o';
-	memory[13] = 'r';
-	memory[14] = 'l';
-	memory[15] = 'd';
-	memory[16] = '!';
-	memory[17] = 0;
 
 	unsigned int instWord = 0b00000000000000000000000001110011;
 	instDecExec(instWord);
@@ -789,7 +918,7 @@ int main(int argc, char* argv[]) {
 			else {
 				instWord = (unsigned char)memory[pc] |
 					(((unsigned char)memory[pc + 1]) << 8);
-				// instword = decompress(instWord);
+				instWord = decompress(instWord);
 				nextPC = pc + 2;
 			}
 
