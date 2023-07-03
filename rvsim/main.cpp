@@ -761,8 +761,8 @@ int main(int argc, char* argv[]) {
 	ofstream outFile;
   
 	unsigned int instWord = 0b11111110110001001110010000010011;
-	x[4].value = 2;
-	instDecExec(0b00000000001000100010000100010011);
+	x[4].value = -1;
+	instDecExec(0b00000000001000100011000100010011);
 	cout << endl<< dec << (int)x[2].value << endl;
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
