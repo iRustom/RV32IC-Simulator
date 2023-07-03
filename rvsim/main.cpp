@@ -761,9 +761,9 @@ int main(int argc, char* argv[]) {
 	ofstream outFile;
   
 	unsigned int instWord = 0b11111110110001001110010000010011;
-	x[9].value = -50;
-	x[10].value = 0;
-	instDecExec(decompress(instWord));
+	x[4].value = -20;
+	instDecExec(0b11111111111100100111000100010011);
+	cout << endl<< dec << (int)x[2].value << endl;
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
