@@ -36,15 +36,6 @@ class regfile {
 			os << reg.value;
 			return os;
 		}
-
-		bool operator==(const bit32& other) const {
-			return value == other.value;
-		}
-
-		bool operator<(const bit32& other) const {
-			return value < other.value;
-		}
-
 	};
 
 	bit32 arr[32];
@@ -99,38 +90,38 @@ void SW(unsigned int rs2, unsigned int rs1, int S_imm) {
 }
 
 void BEQ(unsigned int rs1, unsigned int rs2, int B_imm) {
-	if (x[rs1] == x[rs2]) {
-		nextPC = pc + B_imm;	//if equal, jump
+	if (x[rs1].value == x[rs2].value) {
+		nextPC = pc + B_imm;
 	}
 }
 
 void BNE(unsigned int rs1, unsigned int rs2, int B_imm) {
 	if (x[rs1].value != x[rs2].value) {
-		nextPC = pc + B_imm;	//if not equal, jump
+		nextPC = pc + B_imm;
 	}
 }
 
 void BLT(unsigned int rs1, unsigned int rs2, int B_imm) {
 	if ((int)(x[rs1].value) < (int)(x[rs2].value)) {
-		nextPC = pc + B_imm;	//if less than, jump
+		nextPC = pc + B_imm;
 	}
 }
 
 void BGE(unsigned int rs1, unsigned int rs2, int B_imm) {
 	if ((int)(x[rs1].value) >= (int)(x[rs2].value)) {
-		nextPC = pc + B_imm;	
+		nextPC = pc + B_imm;
 	}
 }
 
 void BLTU(unsigned int rs1, unsigned int rs2, int B_imm) {
-	if (x[rs1] < x[rs2]) {
-		nextPC = pc + B_imm;	//if less than, jump
+	if (x[rs1].value < x[rs2].value) {
+		nextPC = pc + B_imm;
 	}
 }
 
 void BGEU(unsigned int rs1, unsigned int rs2, int B_imm) {
 	if (x[rs1].value >= x[rs2].value) {
-		nextPC = pc + B_imm;	
+		nextPC = pc + B_imm;
 	}
 }
 
