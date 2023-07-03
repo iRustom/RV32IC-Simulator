@@ -766,9 +766,7 @@ int main(int argc, char* argv[]) {
 	memory[96] = 0x78;
 	memory[97] = 0x56;
 	x[4].value = 90;
-	LB(5,4,-1);
-
-	//LH(4, 5, 6);
+	LH(5,4,-1);
 	//LW(7, 8, 9);
 	//LBU(10, 11, 12);
 	//LHU(13, 14, 15);
