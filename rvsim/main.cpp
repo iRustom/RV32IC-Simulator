@@ -134,6 +134,45 @@ void BGEU(unsigned int rs1, unsigned int rs2, int B_imm) {
 	}
 }
 
+void AUIPC(unsigned int rd, int U_imm) {
+	nextPC = pc + U_imm;
+	x[rd] = nextPC;
+}
+
+void LUI(unsigned int rd, int U_imm) {
+	x[rd] = U_imm;
+}
+
+void JAL(unsigned int rd, int J_imm) {
+	x[rd] = nextPC;
+	nextPC = pc + J_imm;
+}
+
+void JALR(unsigned int rd, unsigned int rs1, int I_imm) {
+	x[rd] = nextPC;
+	nextPC = (x[rs1].value + I_imm) & 0xFFFFFFFE;	/*"The target address is obtained by adding the sign - extended 12 - bit I - immediate
+													to the register rs1, then setting the least - significant bit of the result to zero." from rv documentation*/
+}
+
+void ECALL() {
+	switch (x[17].value) {
+	case 1: cout << dec << (int)x[10].value;
+		break;
+	case 4: {
+		unsigned int base_address = x[10].value;
+		while (memory[base_address] != '\0') {
+			cout << memory[base_address];
+			base_address++;
+		}
+	}
+		  break;
+	case 10: exit(0);
+		break;
+
+	default: emitError("Illegal ecall number\n");
+	}
+}
+
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
@@ -317,23 +356,23 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
 		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
-		
+		AUIPC(rd, U_imm);
 	}
 	else if (opcode == 0x37) {	//U-type (LUI)
 		cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
-		
+		LUI(rd, U_imm);
 	}
 	else if (opcode == 0x6F) {	//J-type (JAL)
 		cout << "\tJAL\tx" << dec << rd << ", " << dec << (int)J_imm << "\n";
-		
+		JAL(rd, J_imm);
 	}
 	else if (opcode == 0x67) {	//I-type (JALR)
 		cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
-		
+		JALR(rd, rs1, I_imm);
 	}
 	else if (opcode == 0x73) {	//(ECALL)
 		cout << "\tECALL\n";
-		
+		ECALL();
 	}
 	else {
 		cout << "\tUnkown Instruction \n";
@@ -712,11 +751,27 @@ int main(int argc, char* argv[]) {
 	//unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
-	pc = 0;
+	pc = 50000;
 	x[1] = -2;
-	x[2] = 0b11111111111111111111111111111010;
+	x[2] = 40;
 	nextPC = 4;
-	unsigned int instWord = 0b00000000001000001010010000100011;
+	x[10] = 5;
+	x[17] = 4;
+	memory[5] = 'H';
+	memory[6] = 'e';
+	memory[7] = 'l';
+	memory[8] = 'l';
+	memory[9] = 'o';
+	memory[10] = ' ';
+	memory[11] = 'W';
+	memory[12] = 'o';
+	memory[13] = 'r';
+	memory[14] = 'l';
+	memory[15] = 'd';
+	memory[16] = '!';
+	memory[17] = 0;
+
+	unsigned int instWord = 0b00000000000000000000000001110011;
 	instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
