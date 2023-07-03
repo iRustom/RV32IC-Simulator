@@ -76,6 +76,28 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << setfill('0') << setw(8) << instA << "\t0x" << setw(8) << instW;
 }
 
+void SB(unsigned int rs2, unsigned int rs1, int S_imm) {
+	unsigned int data = x[rs2].value;
+	unsigned int base_address = x[rs1].value + S_imm;
+	memory[base_address] = data & 0xFF;
+}
+
+void SH(unsigned int rs2, unsigned int rs1, int S_imm) {
+	unsigned int data = x[rs2].value;
+	unsigned int base_address = x[rs1].value + S_imm;
+	memory[base_address] = data & 0xFF;
+	memory[base_address + 1] = (data >> 8) & 0xFF;
+}
+
+void SW(unsigned int rs2, unsigned int rs1, int S_imm) {
+	unsigned int data = x[rs2].value;
+	unsigned int base_address = x[rs1].value + S_imm;
+	memory[base_address] = data & 0xFF;
+	memory[base_address + 1] = (data >> 8) & 0xFF;
+	memory[base_address + 2] = (data >> 16) & 0xFF;
+	memory[base_address + 3] = (data >> 24) & 0xFF;
+}
+
 void BEQ(unsigned int rs1, unsigned int rs2, int B_imm) {
 	if (x[rs1] == x[rs2]) {
 		nextPC = pc + B_imm;	//if equal, jump
@@ -238,19 +260,19 @@ void instDecExec(unsigned int instWord)
 		switch(funct3){
 		case 0: {
 			cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
-			
+			SB(rs2, rs1, S_imm);
 			}
 			break;
 
 		case 1: {
 			cout << "\tSH\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
-			
+			SH(rs2, rs1, S_imm);
 			}
 			break;
 
 		case 2: {
 			cout << "\tSW\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
-			
+			SW(rs2, rs1, S_imm);
 			}
 			break;
 
@@ -692,9 +714,9 @@ int main(int argc, char* argv[]) {
 	ofstream outFile;
 	pc = 0;
 	x[1] = -2;
-	x[2] = 2147483646;
+	x[2] = 0b11111111111111111111111111111010;
 	nextPC = 4;
-	unsigned int instWord = 0b00000000001000001101101101100011;
+	unsigned int instWord = 0b00000000001000001010010000100011;
 	instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
