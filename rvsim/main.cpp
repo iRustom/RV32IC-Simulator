@@ -756,14 +756,24 @@ unsigned int decompress(unsigned int instWord) {
 
 int main(int argc, char* argv[]) {
 
-	//unsigned int instWord = 0;
+	unsigned int instWord = 0;
 	ifstream inFile;
 	ofstream outFile;
   
-	unsigned int instWord = 0b11111110110001001110010000010011;
-	x[4].value = -1;
-	instDecExec(0b00000000001000100011000100010011);
-	cout << endl<< dec << (int)x[2].value << endl;
+	// code to test LB, LH, LW, LBU, LHU
+	memory[89] = 0xFF;
+	memory[90] = 0x34;
+	memory[96] = 0x78;
+	memory[97] = 0x56;
+	x[4].value = 90;
+	LB(5,4,-1);
+
+	//LH(4, 5, 6);
+	//LW(7, 8, 9);
+	//LBU(10, 11, 12);
+	//LHU(13, 14, 15);
+	
+	cout << endl<< hex << (int)x[5].value << endl;
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
