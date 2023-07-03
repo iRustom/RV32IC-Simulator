@@ -68,71 +68,69 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 
 void ADD(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value + x[rs2].value; 
+	x[rd] = x[rs1].value + x[rs2].value; 
 	
 }
 void SUB(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value - x[rs2].value;
+	x[rd] = x[rs1].value - x[rs2].value;
 	
 
 }
 void XOR(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value ^ x[rs2].value;
+	x[rd] = x[rs1].value ^ x[rs2].value;
 }
 void OR(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value | x[rs2].value;
+	x[rd] = x[rs1].value | x[rs2].value;
 	
 }
 void AND(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value & x[rs2].value;
+	x[rd] = x[rs1].value & x[rs2].value;
 	
 }
 
 void SLL(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value << x[rs2].value;
+	x[rd] = x[rs1].value << x[rs2].value;
 }
 
 void SRL(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = x[rs1].value >> x[rs2].value;
+	x[rd] = x[rs1].value >> x[rs2].value;
 }
 
 void SRA(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = (signed int) x[rs1].value >> x[rs2].value;
+	x[rd] = (signed int) x[rs1].value >> x[rs2].value;
 }
 void SLT(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = ((signed int)x[rs1].value < (signed int)x[rs2].value) ? 1:0;
+	x[rd] = ((signed int)x[rs1].value < (signed int)x[rs2].value) ? 1:0;
 }
 void SLTU(unsigned int rd, unsigned int rs1, unsigned int rs2)
 {
-	x[rd].value = (x[rs1].value < x[rs2].value) ? 1 : 0;
+	x[rd] = (x[rs1].value < x[rs2].value) ? 1 : 0;
 }
 void ADDI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
-	x[rd].value = x[rs1].value + imm;
+	x[rd] = x[rs1].value + imm;
 }
 void XORI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
-	x[rd].value = x[rs1].value ^ imm;
+	x[rd] = x[rs1].value ^ imm;
 }
 void ORI(unsigned int rd, unsigned int rs1, unsigned int imm)
 {
-	x[rd].value = x[rs1].value | imm;
-	cout << endl << dec << (signed int)x[rs1].value << endl << (signed int)imm << endl << (signed int)x[rd].value << endl;
+	x[rd] = x[rs1].value | imm;
 }
 
 // execute Set B
 // ANDI
 void ANDI(unsigned int rd, unsigned int rs1, unsigned int imm){
 	x[rd] = x[rs1].value & imm;
-
 }
 // SLLI
 void SLLI(unsigned int rd, unsigned int rs1, unsigned int imm){
@@ -760,18 +758,6 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
   
-	// code to test LB, LH, LW, LBU, LHU
-	memory[89] = 0xFF;
-	memory[90] = 0xF4;
-	memory[91] = 0x12;
-	memory[92] = 0x78;
-
-	memory[96] = 0x78;
-	memory[97] = 0x56;
-	x[4].value = 90;
-	LHU(5, 4, -1);
-	
-	cout << endl<< hex << (int)x[5].value << endl;
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
