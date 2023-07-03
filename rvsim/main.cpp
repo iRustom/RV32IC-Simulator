@@ -271,14 +271,16 @@ void JALR(unsigned int rd, unsigned int rs1, int I_imm) {
 
 void ECALL() {
 	switch (x[17].value) {
-	case 1: cout << dec << (int)x[10].value;
+	case 1: cout << "Integer print: " << dec << (int)x[10].value << endl;
 		break;
 	case 4: {
+		cout << "String print: ";
 		unsigned int base_address = x[10].value;
 		while (memory[base_address] != '\0') {
 			cout << memory[base_address];
 			base_address++;
 		}
+		cout << endl;
 	}
 		  break;
 	case 10: exit(0);
@@ -509,7 +511,7 @@ void instDecExec(unsigned int instWord)
 		JALR(rd, rs1, I_imm);
 	}
 	else if (opcode == 0x73) {	//(ECALL)
-		cout << "\tECALL\n";
+		cout << "\tECALL\t";
 		ECALL();
 	}
 	else {
@@ -895,7 +897,7 @@ int main(int argc, char* argv[]) {
 
 	//if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
-	inFile.open("C:\\Users\\bodyb\\source\\repos\\rvsim\\Binary_Files\\t0.bin", ios::in | ios::binary | ios::ate);
+	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 
 	if (inFile.is_open())
 	{
@@ -929,7 +931,7 @@ int main(int argc, char* argv[]) {
 			pc += 4;*/
 
 			// remove the following line once you have a complete simulator
-			if (pc > 0x00000068) break;			// stop when PC reached address 32
+			if (pc > 0x00000100) break;			// stop when PC reached address 32
 			instDecExec(instWord);
 			pc = nextPC;
 		}
