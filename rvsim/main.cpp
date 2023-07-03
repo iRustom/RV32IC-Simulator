@@ -891,8 +891,8 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
 
-	unsigned int instWord = 0b00000000000000000000000001110011;
-	instDecExec(instWord);
+	//unsigned int instWord = 0b00000000000000000000000001110011;
+	//instDecExec(instWord);
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
 
