@@ -66,6 +66,32 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 	cout << "0x" << hex << setfill('0') << setw(8) << instA << "\t0x" << setw(8) << instW;
 }
 
+void ADD(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value + x[rs2].value; 
+	
+}
+void SUB(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value - x[rs2].value;
+	
+
+}
+void XOR(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value ^ x[rs2].value;
+}
+void OR(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value | x[rs2].value;
+	
+}
+void AND(unsigned int rd, unsigned int rs1, unsigned int rs2)
+{
+	x[rd].value = x[rs1].value & x[rs2].value;
+	cout << endl << dec << (signed int)x[rs1].value << endl << (signed int)x[rs2].value << endl << (signed int)x[rd].value << endl;
+}
+
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
@@ -94,9 +120,11 @@ void instDecExec(unsigned int instWord)
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
 			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd, rs1, and rs2 as decimal
+			SUB(rd, rs1, rs2);
 		}
 			  else {
 			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			ADD(rd, rs1, rs2);
 		}
 			  break;
 
@@ -110,6 +138,7 @@ void instDecExec(unsigned int instWord)
 			break;
 
 		case 4: cout << "\tXOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				XOR(rd, rs1, rs2);
 			break;
 
 		case 5: if (funct7 == 32) {
@@ -121,9 +150,11 @@ void instDecExec(unsigned int instWord)
 			  break;
 
 		case 6: cout << "\tOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				OR(rd, rs1, rs2);
 			break;
 
 		case 7: cout << "\tAND\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+				AND(rd, rs1, rs2);
 			break;
 
 		default:
@@ -610,7 +641,9 @@ int main(int argc, char* argv[]) {
 	ifstream inFile;
 	ofstream outFile;
   
-	unsigned int instWord = 0b0000000110101010;
+	unsigned int instWord = 0b00000000101001001111010000110011;
+	x[9].value = -10;
+	x[10].value = -9;
 	instDecExec(decompress(instWord));
 
 	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
