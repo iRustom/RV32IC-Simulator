@@ -1,6 +1,7 @@
 # Computer Organization and Assembly Language - Project I - RV32IC-Simulator
 ## How to Build and Use The Simulator
-
+Clone the repo onto your device, then, using the command line pass the two files containing the text and data section to the main and run it. 
+use: rvsim <machine_code_file_name> <data_file_name> ,Where data file is optional
 ## Project Members:
 - Ahmed Ali
 - Omar Elfouly
