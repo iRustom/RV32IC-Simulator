@@ -1,8 +1,5 @@
 /*
-	TO DO:
-	Execute
-	Read data section
-
+	
 	References:
 	(1) The risc-v ISA Manual ver. 2.1 @ https://riscv.org/specifications/
 	(2) https://github.com/michaeljclark/riscv-meta/blob/master/meta/opcodes
@@ -893,19 +890,21 @@ int main(int argc, char* argv[]) {
 	ifstream inFile, dataFile;
 	ofstream outFile;
 
-  
-	/*string argv1 = "t4.bin";
-	string argv2 = "t4-d.bin";
-	argv[1] = &argv1[0];
-	argv[2] = &argv2[0];
-
-
-	argc =3;*/
+	/*
+	string argv1 = "/home/miro/Downloads/tests-rv32i/t4.bin";
+	//std::vector<char> data(foo.data(), foo.data()+foo.size()+1u);
+	vector<char> data(argv1.data(), argv1.data()+argv1.size()+1u);
+	string argv2 = "/home/miro/Downloads/tests-rv32i/t4-d.bin";
+	vector<char> data2(argv2.data(), argv2.data()+argv2.size()+1u);
+	argv[1] = data.data();
+	argv[2] = data2.data();
+	argc =3;
+	*/
 
 	// if argc == 3 we want to read data into memory else only read instructions
 	if (argc == 3) {
 		inFile.open(argv[1], ios::in | ios::binary | ios::ate);
-		dataFile.open(argv[2], ios::out | ios::binary | ios::ate);
+		dataFile.open(argv[2], ios::in | ios::binary | ios::ate);
 		if(!dataFile.is_open()){
 			emitError("Cannot access data file");
 		}
@@ -952,12 +951,6 @@ int main(int argc, char* argv[]) {
 				nextPC = pc + 2;
 			}
 
-			/* removed to allow for compressed instructions
-			instWord = (unsigned char)memory[pc] |
-				(((unsigned char)memory[pc + 1]) << 8) |
-				(((unsigned char)memory[pc + 2]) << 16) |
-				(((unsigned char)memory[pc + 3]) << 24);
-			pc += 4;*/
 
 			
 			instDecExec(instWord);
