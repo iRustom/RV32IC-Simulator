@@ -60,7 +60,7 @@ regfile x;
 void emitError(const char* s)
 {
 	cout << s;
-	exit(0);
+	exit(1);
 }
 
 void printPrefix(unsigned int instA, unsigned int instW) {
