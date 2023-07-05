@@ -602,7 +602,7 @@ unsigned int decompress(unsigned int instWord) {
 			case 0b001: {
 				// C.JAL
 				unsigned int imm = (((instWord >> 3) & 0b111) | (((instWord >> 11) & 0b1) << 3) | (((instWord >> 2) & 0b1) << 4) | (((instWord >> 7) & 0b1) << 5) | (((instWord >> 6) & 0b1) << 6) | (((instWord >> 9) & 0b11) << 7) | (((instWord >> 8) & 0b1) << 9) | (((instWord >> 12) & 0b1) << 10)) << 1 | (((instWord >> 12) & 0b1) ? 0xFFFFF000 : 0x0);
-				instWord = 0b1101111 | (0b00000 << 7) | (imm & 0xFF000) | (((imm >> 11) & 0b1) << 20) | (((imm >> 1) & 0b1111111111) << 21) | ((imm >> 20) & 0b1) << 31;
+				instWord = 0b1101111 | (0b00001 << 7) | (imm & 0xFF000) | (((imm >> 11) & 0b1) << 20) | (((imm >> 1) & 0b1111111111) << 21) | ((imm >> 20) & 0b1) << 31;
 			
 				break;
 			}
