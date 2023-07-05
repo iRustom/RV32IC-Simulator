@@ -920,7 +920,7 @@ int main(int argc, char* argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 		if(argc==3){
-			char * data = new char[16*1024];
+			unsigned char data[16*1024];
 			fsize = dataFile.tellg();
 			dataFile.seekg(0, dataFile.beg);
 			if(!dataFile.read((char*)data, fsize)) emitError("Cannot read from data file\n");
