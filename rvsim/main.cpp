@@ -889,15 +889,28 @@ unsigned int decompress(unsigned int instWord) {
 int main(int argc, char* argv[]) {
 
 	unsigned int instWord = 0;
-	ifstream inFile;
+	ifstream inFile, dataFile;
 	ofstream outFile;
 
 	//unsigned int instWord = 0b00000000000000000000000001110011;
 	//instDecExec(instWord);
 
-	if (argc !=2) emitError("use: rvsim <machine_code_file_name>\n");
+	// if argc == 3 we want to read data into memory else only read instructions
+	if (argc == 3) {
+		inFile.open(argv[1], ios::in | ios::binary | ios::ate);
+		dataFile.open(argv[2], ios::out | ios::binary | ios::ate);
+		if(!dataFile.is_open()){
+		emitError("Cannot access data file");
+	}
+	}
+	else if(argc == 2){
+		inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 
-	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
+	}else{
+		emitError("use: rvsim <machine_code_file_name> <data_file_name>\n Where data file is optional\n");
+	}
+
+	
 
 	if (inFile.is_open())
 	{
@@ -906,6 +919,13 @@ int main(int argc, char* argv[]) {
 
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
+		if(argc==3){
+			char * data = new char[16*1024];
+			if(!dataFile.read((char*)data, fsize)) emitError("Cannot read from data file\n");
+			for(int i = 0; i < 16*1024; i++){
+				memory[0x10000+i] = data[i];
+			}
+		}
 
 		while (true) {
 			// condition to check if it is compressed instruction
