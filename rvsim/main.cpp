@@ -268,7 +268,7 @@ void JALR(unsigned int rd, unsigned int rs1, int I_imm) {
 
 void ECALL() {
 	switch (x[17].value) {
-	case 1: cout << "Integer print: " << dec << (int)x[10].value << endl;
+	case 1: cout << "\n\n\t\t\tInteger print: " << dec << (int)x[10].value << endl<<endl;
 		break;
 	case 4: {
 		cout << "String print: ";
@@ -280,7 +280,7 @@ void ECALL() {
 		cout << endl;
 	}
 		  break;
-	case 10:{ cout << "Program exit(0)\n";
+	case 10:{ cout << "\n\n\t\t\tProgram exit(0)\n\n";
 		exit(0);
 		break;
 	}
