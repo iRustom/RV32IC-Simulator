@@ -893,22 +893,28 @@ int main(int argc, char* argv[]) {
 	ifstream inFile, dataFile;
 	ofstream outFile;
 
-	//unsigned int instWord = 0b00000000000000000000000001110011;
-	//instDecExec(instWord);
+  
+	/*string argv1 = "t4.bin";
+	string argv2 = "t4-d.bin";
+	argv[1] = &argv1[0];
+	argv[2] = &argv2[0];
+
+
+	argc =3;*/
 
 	// if argc == 3 we want to read data into memory else only read instructions
 	if (argc == 3) {
 		inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 		dataFile.open(argv[2], ios::out | ios::binary | ios::ate);
 		if(!dataFile.is_open()){
-		emitError("Cannot access data file");
-	}
+			emitError("Cannot access data file");
+		}
 	}
 	else if(argc == 2){
 		inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 
 	}else{
-		emitError("use: rvsim <machine_code_file_name> <data_file_name>\n Where data file is optional\n");
+		emitError("use: rvsim <machine_code_file_name> <data_file_name>\nWhere data file is optional\n");
 	}
 
 	
