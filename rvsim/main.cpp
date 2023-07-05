@@ -931,7 +931,7 @@ int main(int argc, char* argv[]) {
 			pc += 4;*/
 
 			// remove the following line once you have a complete simulator
-			if (pc > 0x00000100) break;			// stop when PC reached address 32
+			if (pc >= 65535) break;			// stop when PC reached address 32
 			instDecExec(instWord);
 			pc = nextPC;
 		}
