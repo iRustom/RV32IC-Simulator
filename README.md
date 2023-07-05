@@ -7,6 +7,7 @@
 - Bavly Labieb
 
 ## Contribution
+Issues were created for every task that each member was responsible for. In general, each member contributed to all parts of the code, where a group of instructions was assigned to each member to complete, whether to decompress, decode, or execute.
 
 ## Simulator design
 
