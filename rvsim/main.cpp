@@ -921,6 +921,8 @@ int main(int argc, char* argv[]) {
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 		if(argc==3){
 			char * data = new char[16*1024];
+			fszize = dataFile.tellg();
+			dataFile.seekg(0, dataFile.beg);
 			if(!dataFile.read((char*)data, fsize)) emitError("Cannot read from data file\n");
 			for(int i = 0; i < 16*1024; i++){
 				memory[0x10000+i] = data[i];
