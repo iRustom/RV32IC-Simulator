@@ -53,6 +53,8 @@ unsigned int pc;
 unsigned int nextPC;
 unsigned char memory[(16 + 64) * 1024];
 regfile x;
+string abi[32] = { "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5"
+					"s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6" };
 
 void emitError(const char* s)
 {
@@ -315,46 +317,46 @@ void instDecExec(unsigned int instWord)
 	if (opcode == 0x33) {		// R Instructions
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
-			cout << "\tSUB\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";	//added "dec" to output rd, rs1, and rs2 as decimal
+			cout << "\tSUB\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";	//added "dec" to output rd, rs1, and rs2 as decimal
 			SUB(rd, rs1, rs2);
 		}
 			  else {
-			cout << "\tADD\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tADD\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 			ADD(rd, rs1, rs2);
 		}
 			break;
 
-		case 1: cout << "\tSLL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		case 1: cout << "\tSLL\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 			SLL(rd, rs1, rs2);
 			break;
 
-		case 2: cout << "\tSLT\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		case 2: cout << "\tSLT\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 				SLT(rd, rs1, rs2);
 			break;
 
-		case 3: cout << "\tSLTU\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		case 3: cout << "\tSLTU\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 				SLTU(rd, rs1, rs2);
 			break;
 
-		case 4: cout << "\tXOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		case 4: cout << "\tXOR\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 				XOR(rd, rs1, rs2);
 			break;
 
 		case 5: if (funct7 == 32) {
-			cout << "\tSRA\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tSRA\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 			SRA(rd, rs1, rs2);
 		}
 			  else {
-			cout << "\tSRL\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+			cout << "\tSRL\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 			SRL(rd, rs1, rs2);
 		}
 			  break;
 
-		case 6: cout << "\tOR\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		case 6: cout << "\tOR\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 				OR(rd, rs1, rs2);
 			break;
 
-		case 7: cout << "\tAND\tx" << dec << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		case 7: cout << "\tAND\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
 				AND(rd, rs1, rs2);
 			break;
 
@@ -364,40 +366,40 @@ void instDecExec(unsigned int instWord)
 	}
 	else if (opcode == 0x13) {	// I instructions
 		switch (funct3) {
-		case 0:	cout << "\tADDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";	//added "dec" to output rd and rs1 as decimal
+		case 0:	cout << "\tADDI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";	//added "dec" to output rd and rs1 as decimal
 			ADDI(rd, rs1, I_imm);
 			break;
 
-		case 1:	cout << "\tSLLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+		case 1:	cout << "\tSLLI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
 			SLLI(rd, rs1, I_imm&0x01F);
 			break;
 
-		case 2:	cout << "\tSLTI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		case 2:	cout << "\tSLTI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 			SLTI(rd, rs1, I_imm);
 			break;
 
-		case 3:	cout << "\tSLTIU\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		case 3:	cout << "\tSLTIU\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 			SLTIU(rd, rs1, I_imm);
 			break;
 
-		case 4:	cout << "\tXORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		case 4:	cout << "\tXORI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 				XORI(rd, rs1, I_imm);
 			break;
 
 		case 5: if (funct7 == 32) {
-			cout << "\tSRAI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+			cout << "\tSRAI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
 			SRAI(rd, rs1, I_imm&0x01F);
 		}else {
-			cout << "\tSRLI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+			cout << "\tSRLI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
 			SRLI(rd, rs1, I_imm&0x01F);
 		}
 			  break;
 
-		case 6: cout << "\tORI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		case 6: cout << "\tORI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 				ORI(rd, rs1, I_imm);
 			break;
 
-		case 7: cout << "\tANDI\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		case 7: cout << "\tANDI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 				ANDI(rd, rs1, I_imm);
 			break;
 
@@ -407,23 +409,23 @@ void instDecExec(unsigned int instWord)
 	}
 	else if(opcode == 0x3) {	// I-type load instructions
 		switch (funct3) {
-		case 0: cout << "\tLB\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";	//added "dec" to output rd, rs1, and the offset as decimal
+		case 0: cout << "\tLB\t" << dec << abi[rd] << ", " << (int)I_imm << "(" << abi[rs1] << ")\n";	//added "dec" to output rd, rs1, and the offset as decimal
 			LB(rd, rs1, I_imm);
 			break;
 
-		case 1: cout << "\tLH\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+		case 1: cout << "\tLH\t" << dec << abi[rd] << ", " << (int)I_imm << "(" << abi[rs1] << ")\n";
 			LH(rd, rs1, I_imm);
 			break;
 
-		case 2: cout << "\tLW\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+		case 2: cout << "\tLW\t" << dec << abi[rd] << ", " << (int)I_imm << "(" << abi[rs1] << ")\n";
 			LW(rd, rs1, I_imm);
 			break;
 
-		case 4: cout << "\tLBU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+		case 4: cout << "\tLBU\t" << dec << abi[rd] << ", " << (int)I_imm << "(" << abi[rs1] << ")\n";
 			LBU(rd, rs1, I_imm);
 			break;
 
-		case 5: cout << "\tLHU\tx" << dec << rd << ", " << (int)I_imm << "(x" << rs1 << ")\n";
+		case 5: cout << "\tLHU\t" << dec << abi[rd] << ", " << (int)I_imm << "(" << abi[rs1] << ")\n";
 			LHU(rd, rs1, I_imm);
 			break;
 
@@ -436,19 +438,19 @@ void instDecExec(unsigned int instWord)
 		// funct7 is now imm[11:5]
 		switch(funct3){
 		case 0: {
-			cout << "\tSB\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
+			cout << "\tSB\t" << dec << abi[rs2] << ", " << (int)S_imm << "(" << abi[rs1] << ")\n";
 			SB(rs2, rs1, S_imm);
 			}
 			break;
 
 		case 1: {
-			cout << "\tSH\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
+			cout << "\tSH\t" << dec << abi[rs2] << ", " << (int)S_imm << "(" << abi[rs1] << ")\n";
 			SH(rs2, rs1, S_imm);
 			}
 			break;
 
 		case 2: {
-			cout << "\tSW\tx" << dec << rs2 << ", " << (int)S_imm << "(x" << dec << rs1 << ")\n";
+			cout << "\tSW\t" << dec << abi[rs2] << ", " << (int)S_imm << "(" << abi[rs1] << ")\n";
 			SW(rs2, rs1, S_imm);
 			}
 			break;
@@ -459,32 +461,32 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x63) {	//B-type
 	switch (funct3) {
 	case 0: {
-		cout << "\tBEQ\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		cout << "\tBEQ\t" << dec << abi[rs1] << ", " << abi[rs2] << ", " << hex << "0x" << (int)B_imm << "\n";
 		BEQ(rs1, rs2, B_imm);
 	}
 		break;
 	case 1: {
-		cout << "\tBNE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		cout << "\tBNE\t" << dec << abi[rs1] << ", " << abi[rs2] << ", " << hex << "0x" << (int)B_imm << "\n";
 		BNE(rs1, rs2, B_imm);
 	}
 		break;
 	case 4: {
-		cout << "\tBLT\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		cout << "\tBLT\t" << dec << abi[rs1] << ", " << abi[rs2] << ", " << hex << "0x" << (int)B_imm << "\n";
 		BLT(rs1, rs2, B_imm);
 	}
 		break;
 	case 5: {
-		cout << "\tBGE\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		cout << "\tBGE\t" << dec << abi[rs1] << ", " << abi[rs2] << ", " << hex << "0x" << (int)B_imm << "\n";
 		BGE(rs1, rs2, B_imm);
 	}
 		break;
 	case 6: {
-		cout << "\tBLTU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		cout << "\tBLTU\t" << dec << abi[rs1] << ", " << abi[rs2] << ", " << hex << "0x" << (int)B_imm << "\n";
 		BLTU(rs1, rs2, B_imm);
 	}
 		break;
 	case 7: {
-		cout << "\tBGEU\tx" << dec << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)B_imm << "\n";
+		cout << "\tBGEU\t" << dec << abi[rs1] << ", " << abi[rs2] << ", " << hex << "0x" << (int)B_imm << "\n";
 		BGEU(rs1, rs2, B_imm);
 	}
 		break;
@@ -493,19 +495,19 @@ void instDecExec(unsigned int instWord)
 		}
 	}
 	else if (opcode == 0x17) {	//U-type (AUIPC)
-		cout << "\tAUIPC\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
+		cout << "\tAUIPC\t" << dec << abi[rd] << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
 		AUIPC(rd, U_imm);
 	}
 	else if (opcode == 0x37) {	//U-type (LUI)
-		cout << "\tLUI\tx" << dec << rd << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
+		cout << "\tLUI\t" << dec << abi[rd] << ", " << hex << "0x" << ((int)U_imm >> 12) << "\n";
 		LUI(rd, U_imm);
 	}
 	else if (opcode == 0x6F) {	//J-type (JAL)
-		cout << "\tJAL\tx" << dec << rd << ", " << dec << (int)J_imm << "\n";
+		cout << "\tJAL\t" << dec << abi[rd] << ", " << dec << (int)J_imm << "\n";
 		JAL(rd, J_imm);
 	}
 	else if (opcode == 0x67) {	//I-type (JALR)
-		cout << "\tJALR\tx" << dec << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		cout << "\tJALR\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 		JALR(rd, rs1, I_imm);
 	}
 	else if (opcode == 0x73) {	//(ECALL)
