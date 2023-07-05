@@ -283,9 +283,10 @@ void ECALL() {
 		cout << endl;
 	}
 		  break;
-	case 10: exit(0);
+	case 10:{ cout << "Program exit(0)\n";
+		exit(0);
 		break;
-
+	}
 	default: emitError("Illegal ecall number\n");
 	}
 }
