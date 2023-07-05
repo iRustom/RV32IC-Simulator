@@ -270,10 +270,10 @@ void JALR(unsigned int rd, unsigned int rs1, int I_imm) {
 
 void ECALL() {
 	switch (x[17].value) {
-	case 1: cout << "\n\n\t\t\tInteger print: " << dec << (int)x[10].value << endl<<endl;
+	case 1: cout << "\n\n\t\t\t\tInteger print: " << dec << (int)x[10].value << endl<<endl;
 		break;
 	case 4: {
-		cout << "\n\n\t\t\tString print: ";
+		cout << "\n\n\t\t\t\tString print: ";
 		unsigned int base_address = x[10].value;
 		while (memory[base_address] != '\0') {
 			cout << memory[base_address];
@@ -282,7 +282,7 @@ void ECALL() {
 		cout << endl<<endl;
 	}
 		  break;
-	case 10:{ cout << "\n\n\t\t\tProgram exit(0)\n\n";
+	case 10:{ cout << "\n\n\t\t\t\tProgram exit(0)\n\n";
 		exit(0);
 		break;
 	}
@@ -968,7 +968,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		cout<<"PC\t\tWord\t\tRV32C\t\t\tRV32I\n";
+		cout<<"PC\t\tWord\t\tRV32C(if compressed)\tRV32I\n";
 		cout<<"--------------------------------------------------------------------------------\n";
 
 		while (true) {
