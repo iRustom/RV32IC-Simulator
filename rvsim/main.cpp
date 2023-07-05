@@ -273,13 +273,13 @@ void ECALL() {
 	case 1: cout << "\n\n\t\t\tInteger print: " << dec << (int)x[10].value << endl<<endl;
 		break;
 	case 4: {
-		cout << "String print: ";
+		cout << "\n\n\t\t\tString print: ";
 		unsigned int base_address = x[10].value;
 		while (memory[base_address] != '\0') {
 			cout << memory[base_address];
 			base_address++;
 		}
-		cout << endl;
+		cout << endl<<endl;
 	}
 		  break;
 	case 10:{ cout << "\n\n\t\t\tProgram exit(0)\n\n";
@@ -290,7 +290,7 @@ void ECALL() {
 	}
 }
 
-void instDecExec(unsigned int instWord)
+void instDecExec(unsigned int instWord, string compressedInstruction = "")
 {
 	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
@@ -313,7 +313,11 @@ void instDecExec(unsigned int instWord)
 	J_imm = (((instWord>>21)&0x3FF)<<1) | (((instWord>>20)&0x1)<<11) | (((instWord>>12)&0xFF)<<12) | ((instWord>>31)?0xFFF80000:0x0);
 
 	printPrefix(instPC, instWord);
-
+	if(compressedInstruction != ""){
+		cout << compressedInstruction;
+	}else{
+		cout << "\t\t\t";
+	}
 	if (opcode == 0x33) {		// R Instructions
 		switch (funct3) {
 		case 0: if (funct7 == 32) {
@@ -322,6 +326,7 @@ void instDecExec(unsigned int instWord)
 		}
 			  else {
 			cout << "\tADD\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
+
 			ADD(rd, rs1, rs2);
 		}
 			break;
@@ -348,6 +353,7 @@ void instDecExec(unsigned int instWord)
 		}
 			  else {
 			cout << "\tSRL\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << abi[rs2] << "\n";
+
 			SRL(rd, rs1, rs2);
 		}
 			  break;
@@ -391,15 +397,17 @@ void instDecExec(unsigned int instWord)
 			SRAI(rd, rs1, I_imm&0x01F);
 		}else {
 			cout << "\tSRLI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << ((unsigned int)I_imm & 0x01F) << "\n";
+
 			SRLI(rd, rs1, I_imm&0x01F);
 		}
-			  break;
+		break;
 
 		case 6: cout << "\tORI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
 				ORI(rd, rs1, I_imm);
 			break;
 
 		case 7: cout << "\tANDI\t" << dec << abi[rd] << ", " << abi[rs1] << ", " << hex << "0x" << (int)I_imm << "\n";
+
 				ANDI(rd, rs1, I_imm);
 			break;
 
@@ -520,7 +528,7 @@ void instDecExec(unsigned int instWord)
 }
 
 // function to decompress compressed instructions into 32 bit instructions
-unsigned int decompress(unsigned int instWord) {
+unsigned int decompress(unsigned int instWord, string &instString) {
 	// if opcode
 	// switch funct 3
 	unsigned int opcode = instWord & 0b11;
@@ -546,6 +554,7 @@ unsigned int decompress(unsigned int instWord) {
 				int32 |= ((2)<<15); // rs1 for addi
 				int32 |= ((nzuimm)<<20); // nzuimm for addi
 				instWord=int32;
+				instString = "C.ADDI4SPN";
 				break;
 			}
 			case 0b010: {
@@ -554,7 +563,7 @@ unsigned int decompress(unsigned int instWord) {
 				unsigned int imm = (((instWord >> 6) & 0b1) | (((instWord >> 5) & 0b1) << 4) | (((instWord >> 10) & 0b111) << 1)) << 2;
 				unsigned int rs1_3bit = ((instWord >> 7) & 0b111) + 8;
 				instWord = 0b0000011 | (rd_3bit << 7) | (0b010 << 12) | (rs1_3bit << 15) | (imm << 20);
-			
+				instString = "C.LW";
 				break;
 			}
 			case 0b110: {
@@ -563,7 +572,7 @@ unsigned int decompress(unsigned int instWord) {
 				unsigned int imm = (((instWord >> 6) & 0b1) | (((instWord >> 5) & 0b1) << 4) | (((instWord >> 10) & 0b111) << 1)) << 2;
 				unsigned int rs1_3bit = ((instWord >> 7) & 0b111) + 8;
 				instWord = 0b0100011 | (rs2_3bit << 20) | (0b010 << 12) | (rs1_3bit << 15) | ((imm & 0b11111) << 7) | (((imm & 0b1100000) >> 5) << 25);
-			
+				instString = "C.SW";
 				break;
 			}
 			default:
@@ -578,6 +587,7 @@ unsigned int decompress(unsigned int instWord) {
 				if(instWord==0b0000000000000001){
 					// C.NOP
 					instWord = 0b00000000000000000000000000010011;
+					instString = "C.NOP";
 				}else{
 					// C.ADDI
 					// addi rd, rd, imm[5:0]
@@ -594,6 +604,7 @@ unsigned int decompress(unsigned int instWord) {
 					inst32 |= ((rd)<<15); // rs1 for addi
 					inst32 |= ((imm)<<20); // imm for addi
 					instWord=inst32;
+					instString = "C.ADDI";
 				}
 			
 				break;
@@ -602,7 +613,7 @@ unsigned int decompress(unsigned int instWord) {
 				// C.JAL
 				unsigned int imm = (((instWord >> 3) & 0b111) | (((instWord >> 11) & 0b1) << 3) | (((instWord >> 2) & 0b1) << 4) | (((instWord >> 7) & 0b1) << 5) | (((instWord >> 6) & 0b1) << 6) | (((instWord >> 9) & 0b11) << 7) | (((instWord >> 8) & 0b1) << 9) | (((instWord >> 12) & 0b1) << 10)) << 1 | (((instWord >> 12) & 0b1) ? 0xFFFFF000 : 0x0);
 				instWord = 0b1101111 | (0b00001 << 7) | (imm & 0xFF000) | (((imm >> 11) & 0b1) << 20) | (((imm >> 1) & 0b1111111111) << 21) | ((imm >> 20) & 0b1) << 31;
-			
+				instString = "C.JAL";
 				break;
 			}
 			case 0b010:
@@ -621,6 +632,7 @@ unsigned int decompress(unsigned int instWord) {
 				inst32 |= ((rd)<<7); // rd for addi
 				inst32 |= ((imm)<<20); // imm for addi
 				instWord=inst32;
+				instString = "C.LI";
 				break;
 			}
 			
@@ -645,6 +657,7 @@ unsigned int decompress(unsigned int instWord) {
 					inst32 |= ((rd)<<15); // rs1 for addi
 					inst32 |= ((nzimm)<<20); // nzimm for addi
 					instWord=inst32;
+					instString = "C.ADDI16SP";
 				}else{
 					// C.LUI
 					// lui rd, nzimm[17:12]
@@ -659,6 +672,7 @@ unsigned int decompress(unsigned int instWord) {
 					inst32 |= ((rd)<<7); // rd for lui
 					inst32 |= ((nzimm)<<12); // nzimm for lui
 					instWord=inst32;
+					instString = "C.LUI";
 				}
 				break;
 			}
@@ -670,6 +684,7 @@ unsigned int decompress(unsigned int instWord) {
 					unsigned int shamt = ((instWord & 0x007c) >> 2); 
 					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
 					instWord = 0x00000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
+					instString = "C.SRLI";
 				}
 
 				if (funct2 == 0b01)
@@ -678,6 +693,7 @@ unsigned int decompress(unsigned int instWord) {
 					unsigned int shamt = ((instWord & 0x007c) >> 2); 
 					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
 					instWord = 0x40000000 | (shamt << 20) | (reg << 15) | 0x00005000 | (reg << 7) | 0x00000013;
+					instString = "C.SRAI";
 				}
 
 				if (funct2 == 0b10)
@@ -687,6 +703,7 @@ unsigned int decompress(unsigned int instWord) {
 					(instWord & 0x1000) ? (imm = imm | 0xFC0) : (imm = imm | 0x0);
 					unsigned int reg = (((instWord & 0x0380) >> 7) + 8);
 					instWord = (imm << 20) | (reg << 15) | 0x00000000 | (reg << 7) | 0x00000013;
+					instString = "C.ANDI";
 
 				}	
 
@@ -700,6 +717,7 @@ unsigned int decompress(unsigned int instWord) {
 						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
 						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
 						instWord = 0x40000000 | (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
+						instString = "C.SUB";
 						break;
 					}
 					case 0b01:
@@ -708,6 +726,7 @@ unsigned int decompress(unsigned int instWord) {
 						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
 						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
 						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00004000 |(reg1 << 7) | 0x00000033;
+						instString = "C.XOR";
 						break;
 					}
 					case 0b10:
@@ -716,6 +735,7 @@ unsigned int decompress(unsigned int instWord) {
 						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
 						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
 						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00006000 | (reg1 << 7) | 0x00000033;
+						instString = "C.OR";
 						break;
 					}
 					case 0b11:
@@ -724,6 +744,7 @@ unsigned int decompress(unsigned int instWord) {
 						unsigned int reg1 = (((instWord & 0x0380) >> 7) + 8);
 						unsigned int reg2 = (((instWord & 0x001C) >> 2) + 8);
 						instWord = 0x00000000 | (reg2 << 20) | (reg1 << 15) | 0x00007000 | (reg1 << 7) | 0x00000033;
+						instString = "C.AND";
 						break;
 					}
 					default:
@@ -740,7 +761,7 @@ unsigned int decompress(unsigned int instWord) {
 				// C.J
 				unsigned int imm = (((instWord >> 3) & 0b111) | (((instWord >> 11) & 0b1) << 3) | (((instWord >> 2) & 0b1) << 4) | (((instWord >> 7) & 0b1) << 5) | (((instWord >> 6) & 0b1) << 6) | (((instWord >> 9) & 0b11) << 7) | (((instWord >> 8) & 0b1) << 9) | (((instWord >> 12) & 0b1) << 10)) << 1 | (((instWord >> 12) & 0b1) ? 0xFFFFF000 : 0x0);
 				instWord = 0b1101111 | (0b00000 << 7) | (imm & 0xFF000) | (((imm >> 11) & 0b1) << 20) | (((imm >> 1) & 0b1111111111) << 21) | ((imm >> 20) & 0b1) << 31;
-			
+				instString = "C.J";
 				break;
 			}
 			case 0b110:
@@ -770,6 +791,7 @@ unsigned int decompress(unsigned int instWord) {
 				// put offset [12] into index 31 of inst32
 				inst32 |= ((offset & 0b1000000000000) << 19);
 				instWord=inst32;
+				instString = "C.BEQZ";
 				break;
 			}
 			case 0b111:
@@ -799,6 +821,7 @@ unsigned int decompress(unsigned int instWord) {
 				// put offset [12] into index 31 of inst32
 				inst32 |= ((offset & 0b1000000000000) << 19);
 				instWord=inst32;
+				instString = "C.BNEZ";
 				break;
 			}
 			default:
@@ -819,6 +842,7 @@ unsigned int decompress(unsigned int instWord) {
 				inst32 |= ((rd)<<15); // rs1 for slli
 				inst32 |= ((shamt)<<20); // shamt for slli
 				instWord=inst32;
+				instString = "C.SLLI";
 				break;
 			}
 			case 0b010: 
@@ -828,7 +852,7 @@ unsigned int decompress(unsigned int instWord) {
 				unsigned int imm = (((instWord >> 4) & 0b0111) | (((instWord >> 2) & 0b11) << 4) | (((instWord >> 12) & 0b1) << 3)) << 2;
 				unsigned int rs1 = 0b10;
 				instWord = 0b0000011 | rd | (0b010 << 12) | (rs1 << 15) | (imm << 20);
-			
+				instString = "C.LWSP";
 				break;
 			}
 			case 0b100:
@@ -840,6 +864,7 @@ unsigned int decompress(unsigned int instWord) {
 					// C.JR
 					unsigned int rs1 = (instWord >> 7) & 0b11111;
 					instWord = 0b1100111 | (0b0 << 7) | (0b000 << 12) | (rs1 << 15);
+					instString = "C.JR";
 				}
 				else if (funct1 == 0) {
 					// C.MV
@@ -847,17 +872,20 @@ unsigned int decompress(unsigned int instWord) {
 					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
 					unsigned int reg2 = ((instWord & 0x007C) >> 2);
 					instWord = (reg2 << 20) | (reg1 << 7) | 0x00000033;
+					instString = "C.MV";
 				}
 				else if (funct1 == 1 && funct2 == 0) {
 					// C.JALR
         			unsigned int rs1 = (instWord >> 7) & 0b11111;
 					instWord = 0b1100111 | (0b1 << 7) | (0b000 << 12) | (rs1 << 15);
+					instString = "C.JALR";
 				}
 				else if (funct1 == 1) {
 					// C.ADD
 					unsigned int reg1 = ((instWord & 0x0F80) >> 7);
 					unsigned int reg2 = ((instWord & 0x007C) >> 2);
 					instWord = (reg2 << 20) | (reg1 << 15) | (reg1 << 7) | 0x00000033;
+					instString = "C.ADD";
 				}
 				else {
 					cout << "\tUnkown Compressed Instruction \n";
@@ -870,7 +898,7 @@ unsigned int decompress(unsigned int instWord) {
 				unsigned int imm = (((instWord >> 9) & 0b1111) | (((instWord >> 7) & 0b11) << 4)) << 2;
 				unsigned int rs1 = 0b10;
 				instWord = 0b0100011 | (rs2 << 20) | (0b010 << 12) | (rs1 << 15) | ((imm & 0b011111) << 7) | (((imm & 0b11100000) >> 5) << 25);
-			
+				instString = "C.SWSP";
 				break;
 			}
 			default:
@@ -880,7 +908,10 @@ unsigned int decompress(unsigned int instWord) {
 	else {
 		cout << "\tUnkown Compressed Instruction \n";
 	}
-
+	// add one less tab if instruction is longer than a tab
+	if(instString.length() > 7) instString = "\t" + instString + "\t";
+	else
+		instString = "\t" + instString + "\t\t";
 	return instWord;
 }
 
@@ -937,7 +968,12 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
+		cout<<"PC\t\tWord\t\tRV32C\t\t\tRV32I\n";
+		cout<<"--------------------------------------------------------------------------------\n";
+
 		while (true) {
+			string compressedInstruction = "";
+
 			// condition to check if it is compressed instruction
 			if ((memory[pc] & 0b11) == 0b11) {
 				instWord = (unsigned char)memory[pc] |
@@ -949,13 +985,16 @@ int main(int argc, char* argv[]) {
 			else {
 				instWord = (unsigned char)memory[pc] |
 					(((unsigned char)memory[pc + 1]) << 8);
-				instWord = decompress(instWord);
+				// pass string by refrence to decompress function
+				//instWord = decompress(instWord);
+				
+				instWord = decompress(instWord, compressedInstruction);
 				nextPC = pc + 2;
 			}
 
 
 			
-			instDecExec(instWord);
+			instDecExec(instWord, compressedInstruction);
 			pc = nextPC;
 		}
 	}
