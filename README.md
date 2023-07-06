@@ -1,7 +1,25 @@
 # Computer Organization and Assembly Language - Project I - RV32IC-Simulator
-## How to Build and Use The Simulator
-Clone the repo onto your device, then, using the command line pass the two files containing the text and data section to the main and run it. 
+## How to Build Simulator
+Clone the repo onto your device, then, compile rvsim.cpp into an executable.
+On linux this would mean running the following commands while in the cloned repositories directory:
+```
+make rvsim
+chmod o+rx rvsim
+```
+This will create an executable named rvsim and make it an executable.
+
+If you wish to be able to run rvsim commands without a path to rvsim then run the following commands while in the cloned repoistory where rvsim executable was made:
+```
+sudo mv rvsim /usr/local/bin/rvsim
+```
+
+## How to Use Simulator
+
+Using command line pass the two files containing the text and data section to rvsim. 
 use: rvsim <machine_code_file_name> <data_file_name>, where data file is optional
+
+A comman mistake is forgetting to include the path to each file when your current directory is different than the directory of the files you want to give to rvsim.
+
 ## Project Members:
 - Ahmed Ali
 - Omar Elfouly
@@ -22,5 +40,28 @@ The compressed instruction word is passed to this function. A conditional statem
 ### Main Flow
 Our main code opens the files provided through the command line arguments. The memory is then initialized with the data and text sections using the data and text files, then, we start the "fetch" process by fetching two bytes from the text section of the memory. The first 2 bits of the first byte are used to differentiate between compressed and uncompressed instructions and, based on that, we know whether or not to extract two more bytes to fetch the whole instruction. If the instruction is compressed, it is passed to the decompress function to get the 32-bit instruction passed to instDecExec, which decodes and executes the instruction. 
 
-## Challenges we faced
-Debugging some test cases was a tedious task because we had to make sure each instruction does what it was supposed to do, especially when the number of dynamic instructions in some test cases was relatively large, but we eventually ironed out any bugs that were present in the code. Currently, there are no known issues with our program.
+## Challenges we Faced
+Debugging some test cases was a tedious task because we had to make sure each instruction does what it was supposed to do, especially when the number of dynamic instructions in some test cases was relatively large, but we eventually ironed out any bugs that were present in the code.
+
+To test each instruction the following website and code were used:
+- https://luplab.gitlab.io/rvcodecjs/ : website to assemble individual instructions
+- Code for testing compressed instructions:
+  ```
+		unsigned int compressedInsttructionWord = <compressed instruction word from website>;
+		string compressedInstructionString = "";
+		unsigned int decompressedInstructionWord = decompress(compressedInsttructionWord, compressedInstructionString);
+		instDecExec(decompressedInstructionWord, compressedInstruction);
+  ```
+- Code for testing uncompressed instructions:
+  ```
+		unsigned int uncompressedInsttructionWord = <uncompressed instruction word from website>;
+		instDecExec(uncompressedInsttructionWord, "");
+  ```
+
+Currently, there are no known issues with our program.
+
+## Issues with test cases
+
+Currently, t4 and t5 will not run correctly for the following reasons:
+- t4.asm initialises the sp to an adress in data, whcih eventually leads to both data being lost and items saved by stack pointer (such as ra) being lost. This is why the output of the string print is programmis awesome and is also the reason why Jalr zero, ra, 0 fails due to ra's value being lost when data section is written to.
+- t5-d.bin is empty which means the program is missing the data necessary to run correctly
