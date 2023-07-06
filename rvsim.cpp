@@ -953,7 +953,18 @@ int main(int argc, char* argv[]) {
 
 	if (inFile.is_open())
 	{
-		
+		/*
+		To test each instruction the following website and code can be used:
+		- https://luplab.gitlab.io/rvcodecjs/ : website to assemble individual instructions
+		- code for compressed:
+		unsigned int compressedInsttructionWord = <compressed instruction word from website>;
+		string compressedInstructionString = "";
+		unsigned int decompressedInstructionWord = decompress(compressedInsttructionWord, compressedInstructionString);
+		instDecExec(decompressedInstructionWord, compressedInstruction);
+		- code for uncompressed:
+		unsigned int uncompressedInsttructionWord = <uncompressed instruction word from website>;
+		instDecExec(uncompressedInsttructionWord, "");
+		*/
 		int fsize = inFile.tellg();
 
 		inFile.seekg(0, inFile.beg);
