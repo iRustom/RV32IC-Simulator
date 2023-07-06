@@ -1,5 +1,5 @@
 # Computer Organization and Assembly Language - Project I - RV32IC-Simulator
-## How to Build Simulator
+## How to Build and Install Simulator
 Clone the repo onto your device, then, compile rvsim.cpp into an executable.
 On linux this would mean running the following commands while in the cloned repositories directory:
 ```
