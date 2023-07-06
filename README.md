@@ -12,6 +12,10 @@ If you wish to be able to run rvsim commands without a path to rvsim then run th
 ```
 sudo mv rvsim /usr/local/bin/rvsim
 ```
+On windows, add the rvsim.exe directory to the environment path to be able to run te code anywhere on your device using this command:
+```
+ rvsim <text_file_name> <data_file_name>
+```
 
 ## How to Use Simulator
 
