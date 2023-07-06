@@ -45,7 +45,7 @@ Debugging some test cases was a tedious task because we had to make sure each in
 
 ## How we tested
 
-To test each instruction the following website and code were used:
+To test each instruction the following website and code were used (this exists in main as a comment):
 
 - https://luplab.gitlab.io/rvcodecjs/ : website to assemble individual instructions
   
@@ -71,5 +71,14 @@ Currently, there are no known issues with our program.
 ## Issues with test cases
 
 Currently, t4 and t5 will not run correctly for the following reasons:
-- t4.asm initialises the sp to an adress in data, whcih eventually leads to both data being lost and items saved by stack pointer (such as ra) being lost. This is why the output of the string print is programmis awesome and is also the reason why Jalr zero, ra, 0 fails due to ra's value being lost when data section is written to.
-- t5-d.bin is empty which means the program is missing the data necessary to run correctly
+
+t4.asm initialises the sp to an adress in data, whcih eventually leads to both data being lost and items saved by stack pointer (such as ra) being lost.
+![image](https://github.com/iRustom/RV32IC-Simulator/assets/98827931/5315d93d-4096-4ff5-b097-c2ba3eb7ad53)
+
+This is why the output of the string print is programmis awesome and is also the reason why Jalr zero, ra, 0 fails due to ra's value being lost when data section is written to.
+![image](https://github.com/iRustom/RV32IC-Simulator/assets/98827931/d739952e-bb7f-4915-b73d-06f7bdd5055b)
+
+
+t5-d.bin is empty which means the program is missing the data necessary to run correctly.
+![image](https://github.com/iRustom/RV32IC-Simulator/assets/98827931/2eea1b5f-789d-4afe-bdc2-c88dcccbedd0)
+
