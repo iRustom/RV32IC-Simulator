@@ -6,7 +6,7 @@ On linux this would mean running the following commands while in the cloned repo
 make rvsim
 chmod o+rx rvsim
 ```
-This will create an executable named rvsim and make it an executable.
+This will create an executable named rvsim and give the executable the necessary permissions.
 
 If you wish to be able to run rvsim commands without a path to rvsim then run the following commands while in the cloned repoistory where rvsim executable was made:
 ```
