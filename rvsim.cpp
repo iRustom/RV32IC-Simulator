@@ -162,9 +162,7 @@ void LB(unsigned int rd, unsigned int rs1, unsigned int imm){
 }
 // LH
 void LH(unsigned int rd, unsigned int rs1, unsigned int imm){
-	x[rd] = memory[x[rs1].value + (int)imm];
-	// load second byte
-	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
+	x[rd] = memory[x[rs1].value + (int)imm] | (memory[x[rs1].value + (int)imm + 1] << 8);
 	// sign extend to 32 bits
 	if(x[rd].value & 0b1000000000000000){
 		x[rd].value |= 0xFFFF0000;
@@ -172,13 +170,8 @@ void LH(unsigned int rd, unsigned int rs1, unsigned int imm){
 }
 // LW
 void LW(unsigned int rd, unsigned int rs1, unsigned int imm){
-	x[rd] = memory[x[rs1].value + (int)imm];
-	// load second byte
-	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
-	// load third byte
-	x[rd].value |= memory[x[rs1].value + (int)imm + 2] << 16;
-	// load fourth byte
-	x[rd].value |= memory[x[rs1].value + (int)imm + 3] << 24;
+
+	x[rd] = (unsigned int) memory[x[rs1].value + (int)imm] | ((unsigned int)memory[x[rs1].value + (int)imm + 1] << 8) | ((unsigned int)memory[x[rs1].value + (int)imm + 2] << 16) | ((unsigned int)memory[x[rs1].value + (int)imm + 3] << 24);
 }
 // LBU
 void LBU(unsigned int rd, unsigned int rs1, unsigned int imm){
@@ -186,9 +179,7 @@ void LBU(unsigned int rd, unsigned int rs1, unsigned int imm){
 }
 // LHU
 void LHU(unsigned int rd, unsigned int rs1, unsigned int imm){
-	x[rd] = memory[x[rs1].value + (int)imm];
-	// load second byte
-	x[rd].value |= memory[x[rs1].value + (int)imm + 1] << 8;
+	x[rd] = memory[x[rs1].value + (int)imm] | (memory[x[rs1].value + (int)imm + 1] << 8);
 }
 
 void SB(unsigned int rs2, unsigned int rs1, int S_imm) {
@@ -924,10 +915,10 @@ int main(int argc, char* argv[]) {
 	ofstream outFile;
 
 	/*
-	string argv1 = "/home/miro/Downloads/tests-rv32i/t4.bin";
+	string argv1 = "/home/miro/Downloads/t6.bin";
 	//std::vector<char> data(foo.data(), foo.data()+foo.size()+1u);
 	vector<char> data(argv1.data(), argv1.data()+argv1.size()+1u);
-	string argv2 = "/home/miro/Downloads/tests-rv32i/t4-d.bin";
+	string argv2 = "/home/miro/Downloads/t6-d.bin";
 	vector<char> data2(argv2.data(), argv2.data()+argv2.size()+1u);
 	argv[1] = data.data();
 	argv[2] = data2.data();
