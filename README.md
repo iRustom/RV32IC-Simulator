@@ -43,20 +43,28 @@ Our main code opens the files provided through the command line arguments. The m
 ## Challenges we Faced
 Debugging some test cases was a tedious task because we had to make sure each instruction does what it was supposed to do, especially when the number of dynamic instructions in some test cases was relatively large, but we eventually ironed out any bugs that were present in the code.
 
+## How we tested
+
 To test each instruction the following website and code were used:
+
 - https://luplab.gitlab.io/rvcodecjs/ : website to assemble individual instructions
+  
 - Code for testing compressed instructions:
+
   ```
-		unsigned int compressedInsttructionWord = <compressed instruction word from website>;
-		string compressedInstructionString = "";
-		unsigned int decompressedInstructionWord = decompress(compressedInsttructionWord, compressedInstructionString);
-		instDecExec(decompressedInstructionWord, compressedInstruction);
+	unsigned int compressedInsttructionWord = <compressed instruction word from website>;
+	string compressedInstructionString = "";
+	unsigned int decompressedInstructionWord = decompress(compressedInsttructionWord, compressedInstructionString);
+	instDecExec(decompressedInstructionWord, compressedInstruction);
   ```
 - Code for testing uncompressed instructions:
+
   ```
-		unsigned int uncompressedInsttructionWord = <uncompressed instruction word from website>;
-		instDecExec(uncompressedInsttructionWord, "");
+	unsigned int uncompressedInsttructionWord = <uncompressed instruction word from website>;
+	instDecExec(uncompressedInsttructionWord, "");
   ```
+
+## Issues with program
 
 Currently, there are no known issues with our program.
 
